@@ -1,0 +1,8 @@
+{
+    "name": "WeaverySeedClient",
+    "version": "0.0.0",
+    "dependencies": {
+        "kad": "1.5.17",
+        "kad-webrtc": "1.4.2"
+    }
+}

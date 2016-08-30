@@ -1,0 +1,15 @@
+{
+    "name": "ClientNode",
+    "version": "0.0.0",
+    "scripts": {
+      "build": "./node_modules/.bin/browserify ClientNode.js > ClientNode.browser.js"
+    },
+    "dependencies": {
+        "kad": "1.5.17",
+        "kad-webrtc": "1.4.2"
+    },
+    "devDependencies": {
+      "browserify": "13.1.0",
+      "ws" : "^0.8.1"
+    }
+}
