@@ -1,8 +1,14 @@
 {
     "name": "WeaverySignalServer",
     "version": "0.0.0",
+    "scripts": {
+      "start": "node server.js"
+    },
     "dependencies": {
         "express":"4.14.0",
-        "signal-master": "1.0.1"
+        "ws" : "^0.8.1"
+    },
+    "config": {
+      "port": 8888
     }
 }

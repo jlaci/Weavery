@@ -2,8 +2,8 @@
 
 var kademlia = require('kad');
 var WebRTC = require('kad-webrtc');
-var webSocket = require('./web-socket');
-var SignalClient = require('./signal-client');
+var webSocket = require('./lib/web-socket');
+var SignalClient = require('./lib/signal-client');
 var EventEmitter = require('events').EventEmitter;
 
 var seed = {
@@ -18,7 +18,7 @@ var signalClient = new SignalClient(nodeNick);
 var dht;
 
 webSocket.on('open', function() {
-
+  console.log('Setting up Kademlia ClientNode.');
   var thisNode = new kademlia.Node({
     transport: new WebRTC(new WebRTC.Contact({
       nick: nodeNick
@@ -27,7 +27,9 @@ webSocket.on('open', function() {
   });
 
   thisNode.connect(seed, function(err) {
-    alert("Failed to connect to seed node! " + err)
+    if(err) {
+      alert("Failed to connect to seed node! " + err)
+    }
   });
 
 });

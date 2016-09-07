@@ -2,14 +2,18 @@
     "name": "ClientNode",
     "version": "0.0.0",
     "scripts": {
-      "build": "./node_modules/.bin/browserify ClientNode.js > ClientNode.browser.js"
+      "install": "npm-git install",
+      "start": "./node_modules/.bin/browserify ClientNode.js > ClientNode.browser.js; http-server -c-1"
     },
     "dependencies": {
         "kad": "1.5.17",
-        "kad-webrtc": "1.4.2"
+        "socket.io-client": "1.4.8"
+    },
+    "gitDependencies": {
+      "kad-webrtc": "https://github.com/handijk/kad-webrtc.git"
     },
     "devDependencies": {
       "browserify": "13.1.0",
-      "ws" : "^0.8.1"
+      "npm-git-install": "latest"
     }
 }

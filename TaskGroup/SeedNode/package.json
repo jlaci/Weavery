@@ -1,8 +1,21 @@
 {
-    "name": "WeaverySeedClient",
-    "version": "0.0.0",
-    "dependencies": {
-        "kad": "1.5.17",
-        "kad-webrtc": "1.4.2"
-    }
+  "name": "WeaverySeedClient",
+  "version": "0.0.0",
+  "scripts": {
+    "install": "npm-git install",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "kad": "1.5.17",
+    "npm-git-install": "^0.2.0",
+    "socket.io-client": "1.4.8",
+    "wrtc": "0.0.61",
+    "ws": "1.1.0"
+  },
+  "gitDependencies": {
+    "kad-webrtc": "https://github.com/handijk/kad-webrtc.git"
+  },
+  "devDependencies": {
+    "npm-git-install": "latest"
+  }
 }

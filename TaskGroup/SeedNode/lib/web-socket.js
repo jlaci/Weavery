@@ -1,4 +1,6 @@
 var EventEmitter = require('events').EventEmitter;
+var WebSocket = require('ws');
+
 var emitter = new EventEmitter();
 var socket = new WebSocket('ws://localhost:8888');
 
