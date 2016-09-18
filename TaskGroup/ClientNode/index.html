@@ -1,1 +1,20 @@
-<!doctype html><script src="ClientNode.browser.js"></script>
+<!doctype html>
+<html>
+    <head>
+      <script src="ClientNode.browser.js"></script>
+    </head>
+    <body>
+        <h1>Test site</h1>
+        <div>
+          <ul>
+            <li>Status: <span id="status">-</span></li>
+            <li>Node id: <span id="node_id">-</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <button onclick="dht.put('key', 'megnyomtam', alert('cb'));"></button>
+        </div>
+
+    </body>
+</html>

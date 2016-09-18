@@ -7,20 +7,15 @@ var wrtc = require('wrtc');
 
 var nodeNick = 'seed';
 var signalClient = new SignalClient(nodeNick);
-var dht;
 
-webSocket.on('open', function() {
-  console.log('Setting up Kademlia SeedNode.');
-  var thisNode = new kademlia.Node({
-    transport: new WebRTC(new WebRTC.Contact({nick: nodeNick}), {
-      wrtc: wrtc,
-      signaller: signalClient
-    }),
-    storage: new kademlia.storage.LocalStorage(nodeNick)
-  });
+var thisNode = new kademlia.Node({
+  transport: new WebRTC(new WebRTC.Contact({nick: nodeNick}), {
+    wrtc: wrtc,
+    signaller: signalClient
+  }),
+  storage: new kademlia.storage.MemStore()
+});
 
-  thisNode.on('connect', function(data) {
-    console.log("Client connected to seed node " + data);
-  });
-
+thisNode.on('connect', function(data) {
+  console.log("Client connected to seed node " + data);
 });

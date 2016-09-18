@@ -1,6 +1,4 @@
 var EventEmitter = require('events').EventEmitter;
-var WebSocket = require('ws');
-
 var emitter = new EventEmitter();
 var socket = new WebSocket('ws://localhost:8888');
 
@@ -11,14 +9,13 @@ var socket = new WebSocket('ws://localhost:8888');
 */
 socket.onerror = function(error) {
   console.log('onerror', error);
-  emitter.emit('error', error);
 };
 
 /**
 * Handle socket close
 */
 socket.onclose = function() {
-  emitter.emit('close');
+  console.log('onclose');
 };
 
 /**

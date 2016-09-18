@@ -1,4 +1,10 @@
+#!/usr/bin/env node
+
+'use strict';
+
 var http = require('http');
+var path = require('path');
+var fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
 var signaller = new EventEmitter();
 var WebSocketServer = require('ws').Server;
@@ -27,9 +33,10 @@ ws.on('connection', function(connection) {
     });
 
     connection.on('close', function() {
+      console.log('Websocket closing');
       signaller.removeAllListeners(parsed.announceNick);
     });
   });
 });
 
-console.log('Signal server listening on port', port);
+console.log('listening on port', port);

@@ -1,0 +1,19 @@
+{
+    "name": "WebSeedNode",
+    "version": "0.0.0",
+    "scripts": {
+      "install": "npm-git install",
+      "start": "./node_modules/.bin/browserify WebSeedNode.js > WebSeedNode.browser.js; http-server -c-1 -p 8089"
+    },
+    "dependencies": {
+        "kad": "1.5.17",
+        "socket.io-client": "1.4.8"
+    },
+    "gitDependencies": {
+      "kad-webrtc": "https://github.com/handijk/kad-webrtc.git"
+    },
+    "devDependencies": {
+      "browserify": "13.1.0",
+      "npm-git-install": "latest"
+    }
+}

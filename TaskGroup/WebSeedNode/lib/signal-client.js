@@ -19,13 +19,9 @@ function SignalClient(nick) {
     webSocket.send(JSON.stringify({ announceNick: nick }));
   });
 
-  webSocket.on('close', function() {
-    console.log('WebSocket to signal server closed.');
-  });
-
   webSocket.on('message', function(message) {
     var parsed = JSON.parse(message);
-    console.log('Received message on socket ' + parsed.message);
+    console.log('Received message on socket ' + parsed);
     if(nick === parsed.recipient) {
       EventEmitter.prototype.emit.call(signalClient, nick, parsed.message);
     }
