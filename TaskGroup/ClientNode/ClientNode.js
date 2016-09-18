@@ -14,8 +14,6 @@ var nodeNick = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(
 });
 var signalClient = new SignalClient(nodeNick);
 
-var dht;
-
 webSocket.on('open', function() {
   console.log('Setting up Kademlia ClientNode.');
   var thisNode = new kademlia.Node({
@@ -33,5 +31,7 @@ webSocket.on('open', function() {
     }
   });
 
-  dht = thisNode;
+  window.Weavery = {
+    dht: thisNode
+  }
 });

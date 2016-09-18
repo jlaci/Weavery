@@ -15,13 +15,13 @@ function SignalClient(nick) {
   var signalClient = this;
 
   webSocket.on('open', function() {
-    console.log('WebSocket to SignalServer open, announcing ClientNode join with nick ' + nick);
+    //console.log('WebSocket to SignalServer open, announcing ClientNode join with nick ' + nick);
     webSocket.send(JSON.stringify({ announceNick: nick }));
   });
 
   webSocket.on('message', function(message) {
+    //console.log('Received message on socket ' + message);
     var parsed = JSON.parse(message);
-    console.log('Received message on socket ' + parsed);
     if(nick === parsed.recipient) {
       EventEmitter.prototype.emit.call(signalClient, nick, parsed.message);
     }

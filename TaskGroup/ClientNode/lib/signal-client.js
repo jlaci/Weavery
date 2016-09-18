@@ -20,8 +20,8 @@ function SignalClient(nick) {
   });
 
   webSocket.on('message', function(message) {
+    console.log('Received message on socket ' + message);
     var parsed = JSON.parse(message);
-    console.log('Received message on socket ' + parsed);
     if(nick === parsed.recipient) {
       EventEmitter.prototype.emit.call(signalClient, nick, parsed.message);
     }

@@ -1,9 +1,29 @@
 <!doctype html>
 <html>
     <head>
-      <script src="WebSeedNode.browser.js"></script>
+      <script src="dist/WebSeedNode.browser.js"></script>
+      <script src="js/Jobs.js"></script>
+      <script src="js/JobManager.js"></script>
     </head>
     <body>
         <h1>WebSeed node</h1>
+
+        <script>
+          var seedNode = new SeedNode();
+          var jobManager = new JobManager(seedNode);
+        </script>
+        <button onclick="jobManager.createTestJob()">Send test job</button>
+
+        <div id="log">
+        </div>
+        <script>
+        window.console = {
+          log: function(str){
+            var node = document.createElement("div");
+            node.appendChild(document.createTextNode(str));
+            document.getElementById("log").appendChild(node);
+          }
+        }
+        </script>
     </body>
 </html>
