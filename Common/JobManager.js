@@ -1,11 +1,16 @@
-JobManager = function(seedNode) {
-    this.seedNode = seedNode;
-};
+var Jobs = require("./Jobs");
+
+function JobManager(jobMap) {
+    this.jobMap = jobMap;
+}
 
 JobManager.prototype = {
+    jobMap: null,
     sendJob : function(jobDescription, jobProgram, jobDataParts) {
+        var self = this;
+
         //Update the job listing
-        seedNode.dht.get('jobs', function(err, value) {
+        self.jobMap.get('jobs', function(err, value) {
             //Get the current job description table and update it
             var jobs = value;
             if(jobs === undefined) {
@@ -14,26 +19,28 @@ JobManager.prototype = {
 
             }
             jobs.push(jobDescription);
-            seedNode.dht.put('jobs', jobs, function() {});
+            self.jobMap.put('jobs', jobs, function() {});
 
             //Upload the program
-            seedNode.dht.put(jobDescription.id + '_program', jobProgram, function() {});
+            self.jobMap.put(jobDescription.id + '_program', jobProgram, function() {});
 
             //Upload the parts
             for(var i = 0; i < jobDataParts.length; i++) {
-                seedNode.dht.put(jobDescription.id + '_datapart_' + i, jobDataParts[i], function() {});
+                self.jobMap.put(jobDescription.id + '_datapart_' + i, jobDataParts[i], function() {});
             }
         });
     },
     createTestJob : function() {
         var self = this;
         var id = 'testjob';
-        var testDescription = new JobDescription(id, 100);
-        var testProgram = new JobProgram(id, "return 5 * data");
+        var testDescription = new Jobs.JobDescription(id, 100);
+        var testProgram = new Jobs.JobProgram(id, "return 5 * data");
         var testData = [];
         for(var i = 0; i < 100; i++) {
-            testData.push(new JobDataPart(id, i, i));
+            testData.push(new Jobs.JobDataPart(id, i, i));
         }
         self.sendJob(testDescription, testProgram, testData);
     }
 };
+
+module.exports = JobManager;

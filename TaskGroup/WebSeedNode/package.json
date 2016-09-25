@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "scripts": {
       "install": "npm-git install",
-      "start": "./node_modules/.bin/browserify js/WebSeedNode.js > dist/WebSeedNode.browser.js; http-server -c-1 -p 8089"
+      "start": "./node_modules/.bin/browserify js/Client.js > dist/Client.browser.js; http-server -c-1 -p 8089"
     },
     "dependencies": {
         "kad": "1.5.17",
