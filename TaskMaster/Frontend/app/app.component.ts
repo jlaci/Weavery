@@ -5,4 +5,7 @@ import { Component } from '@angular/core';
     templateUrl: 'app/main.html'
 })
 
-export class AppComponent { }
+export class AppComponent {
+    address = '127.0.0.1';
+    port = '8880';
+}

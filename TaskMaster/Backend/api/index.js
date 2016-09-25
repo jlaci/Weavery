@@ -1,6 +1,6 @@
 var express = require('express');
 var app = module.exports = express();
-var statistics = require('./statistics');
+var taskgroup = require('./taskgroup');
 
 
 app.get('/', function(req, res) {
@@ -9,4 +9,4 @@ app.get('/', function(req, res) {
     });
 });
 
-app.use('/statistics', statistics);
+app.use('/taskgroup', taskgroup);
