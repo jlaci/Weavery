@@ -6,8 +6,7 @@
       "start": "./node_modules/.bin/browserify ClientNode.js > ClientNode.browser.js; http-server -c-1"
     },
     "dependencies": {
-        "kad": "1.5.17",
-        "socket.io-client": "1.4.8"
+        "kad": "1.5.17"
     },
     "gitDependencies": {
       "kad-webrtc": "https://github.com/handijk/kad-webrtc.git"
