@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 'use strict';
 
 var http = require('http');
@@ -9,7 +8,19 @@ var server = require('http').createServer().listen(port);
 var ws = new WebSocketServer({ server: server });
 
 var jobMap = {};
-var clients = [];
+var localJobMap = {
+    get: function(key, cb) {
+        cb(jobMap[key]);
+    },
+    put: function (key, value, cb) {
+        jobMap[key] = value;
+        cb();
+    }
+};
+
+var JobManager = require("../../Common/Jobs/JobManager");
+var jobManager = new JobManager(localJobMap);
+
 
 ws.on('connection', function(connection) {
 
@@ -18,7 +29,9 @@ ws.on('connection', function(connection) {
     connection.on('message', function(messageData) {
         var message = JSON.parse(messageData);
         if(message.type === 'JobOffer') {
-            jobMap[message.job.id] = message.job;
+            jobManager.sendJob(message.jobDescription, message.jobProgram, message.jobDataParts);
+        } else if(message.type === 'ClientJoin') {
+            //TODO: handle client job assignement
         }
 
     });

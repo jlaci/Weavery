@@ -1,4 +1,4 @@
-var JobManager = require("../../../Common/JobManager");
+var JobManager = require("../../../Common/Jobs/JobManager");
 var SeedNode = require("./WebSeedNode");
 
 var jobMap = new SeedNode();

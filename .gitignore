@@ -5,3 +5,6 @@ node_modules/**
 /node_modules/**
 node_modules
 npm-debug.log.*
+TaskMaster/Frontend/typings
+TaskMaster/Frontend/app/**/*.js
+TaskMaster/Frontend/app/**/*.map
