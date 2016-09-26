@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import {TaskGroup} from "../../domain/TaskGroup/task-group";
+import {Component, OnInit} from '@angular/core';
+import {TaskGroup, WorkingMode} from "../../domain/TaskGroup/task-group";
 import {TaskGroupService} from "../../domain/TaskGroup/task-group.service";
 
 
@@ -9,7 +9,12 @@ import {TaskGroupService} from "../../domain/TaskGroup/task-group.service";
     providers: [TaskGroupService]
 })
 
-export class ControlPanel {
+export class ControlPanel implements OnInit{
+    taskGroup : TaskGroup = new TaskGroup('', WorkingMode.Centralised);
+
     constructor(private taskGroupService : TaskGroupService) { }
-    taskGroup : TaskGroup = this.taskGroupService.getTaskGroup();
+
+    ngOnInit(): void {
+       this.taskGroupService.getTaskGroup().then(taskGroup => this.taskGroup = taskGroup);
+    }
 }

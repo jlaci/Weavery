@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
+import {api} from "../../app.config";
 
 @Component({
     selector: 'task-master-navbar',
     templateUrl: 'app/view/Navbar/navbar.html'
 })
 
-export class NavbarComponent {
-    address = '127.0.0.1';
-    port = '8880';
+export class Navbar {
+    backendUrl = api.serverAddress;
 }
