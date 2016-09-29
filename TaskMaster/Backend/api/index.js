@@ -1,6 +1,8 @@
 var express = require('express');
 var app = module.exports = express();
+
 var taskgroup = require('./taskgroup');
+var job = require('./job/job');
 
 
 app.get('/', function(req, res) {
@@ -10,3 +12,4 @@ app.get('/', function(req, res) {
 });
 
 app.use('/taskgroup', taskgroup);
+app.use('/job', job);

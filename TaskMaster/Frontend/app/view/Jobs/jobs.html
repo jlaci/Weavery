@@ -1,1 +1,20 @@
 <h1>Jobs</h1>
+
+<table class="table">
+    <tr>
+        <th>Job ID</th>
+        <th>Size</th>
+        <th>Issuer</th>
+        <th>Creation date</th>
+        <th>State</th>
+        <th>Operations</th>
+    </tr>
+    <tr *ngFor="let job of jobDescriptions">
+        <td>{{job.jobId}}</td>
+        <td>{{job.size}}</td>
+        <td>{{job.issuer}}</td>
+        <td>{{job.createdDate}}</td>
+        <td>{{job.state}}</td>
+        <td><a><i class="fa fa-fw fa-eye"></i>View</a></td>
+    </tr>
+</table>
