@@ -5,6 +5,7 @@ export enum WorkingMode {
 }
 
 export class TaskGroup {
+    id: string;
     name: string;
     workingMode: WorkingMode;
     constructor(name: string, workingMode: WorkingMode) {
