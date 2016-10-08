@@ -1,12 +1,17 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var jobDataPartSchema = new Schema({
+var joResultSchema = new Schema({
     jobId : {
+        type: String,
+        required: true,
+        unique: true
+    },
+    clientId : {
         type: String,
         required: true
     },
-    data : {
+    result : {
         type: Schema.Types.Mixed,
         required: true
     },
@@ -16,5 +21,5 @@ var jobDataPartSchema = new Schema({
     }
 });
 
-var Model = mongoose.model('JobDataPart', jobDataPartSchema);
+var Model = mongoose.model('JobResult', joResultSchema);
 module.exports = Model;

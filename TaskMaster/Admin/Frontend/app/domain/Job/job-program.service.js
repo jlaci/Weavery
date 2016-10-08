@@ -12,31 +12,25 @@ var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
 var app_config_1 = require("../../app.config");
 require('rxjs/add/operator/toPromise');
-var JobDescriptionService = (function () {
-    function JobDescriptionService(http) {
+var JobProgramService = (function () {
+    function JobProgramService(http) {
         this.http = http;
     }
-    JobDescriptionService.prototype.getJobDescriptions = function () {
-        return this.http.get(app_config_1.api.url + '/job')
+    JobProgramService.prototype.getJobProgram = function (jobId) {
+        return this.http.get(app_config_1.api.url + '/job/' + jobId + '/program')
             .toPromise()
             .then(function (response) { return response.json(); })
-            .catch(JobDescriptionService.handleError);
+            .catch(JobProgramService.handleError);
     };
-    JobDescriptionService.prototype.getJobDescription = function (jobId) {
-        return this.http.get(app_config_1.api.url + '/job/' + jobId)
-            .toPromise()
-            .then(function (response) { return response.json(); })
-            .catch(JobDescriptionService.handleError);
-    };
-    JobDescriptionService.handleError = function (error) {
+    JobProgramService.handleError = function (error) {
         console.error('An error occurred', error);
         return Promise.reject(error.message || error);
     };
-    JobDescriptionService = __decorate([
+    JobProgramService = __decorate([
         core_1.Injectable(), 
         __metadata('design:paramtypes', [http_1.Http])
-    ], JobDescriptionService);
-    return JobDescriptionService;
+    ], JobProgramService);
+    return JobProgramService;
 }());
-exports.JobDescriptionService = JobDescriptionService;
-//# sourceMappingURL=job-description.service.js.map
+exports.JobProgramService = JobProgramService;
+//# sourceMappingURL=job-program.service.js.map

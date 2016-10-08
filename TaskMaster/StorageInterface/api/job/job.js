@@ -3,6 +3,7 @@ var app = module.exports = express();
 var JobDescription = require('./model/JobDescription');
 var JobProgram = require('./model/JobProgram');
 var JobDataPart = require('./model/JobDataPart');
+var JobResult = require('./model/JobResult');
 
 app.get('/', function (req, res) {
     JobDescription.find({}, function (err, jobs) {
@@ -57,5 +58,35 @@ app.get('/:jobId/data/:index', function (req, res) {
             res.statusCode = 500;
             res.end();
         }
+    });
+});
+
+app.get('/:jobId/result/', function (req, res) {
+    JobResult.find({jobId : req.params.jobId}, function(err, result) {
+        if(!err) {
+            res.json(result);
+        } else {
+            res.statusCode = 500;
+            res.end();
+        }
+    });
+});
+
+app.get('/:jobId/result/:index', function (req, res) {
+    JobResult.find({jobId : req.params.jobId, index: req.params.index}, function(err, result) {
+        if(!err) {
+            res.json(result);
+        } else {
+            res.statusCode = 500;
+            res.end();
+        }
+    });
+});
+
+app.post('/:jobId/result/', function (req, res) {
+    new JobResult(req.body.result).save(function (err) {
+        console.log(err);
+        res.statusCode = 500;
+        res.end();
     });
 });

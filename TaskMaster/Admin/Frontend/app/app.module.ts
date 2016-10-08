@@ -8,10 +8,12 @@ import {routing} from "./app.routes";
 import {Jobs} from "./view/Jobs/jobs.component";
 import {Diagnostics} from "./view/Diagnostics/diagnostics.component";
 import {HttpModule} from "@angular/http";
+import {JobDetails} from "./view/Jobs/JobDetails/job-details.component";
+import {JobResults} from "./view/Jobs/JobResults/job-results.component";
 
 @NgModule({
     imports:      [ BrowserModule, HttpModule, routing ],
-    declarations: [ AppComponent, ControlPanel, Navbar, Jobs, Diagnostics ],
+    declarations: [ AppComponent, ControlPanel, Navbar, Jobs, Diagnostics, JobDetails, JobResults ],
     bootstrap:    [ AppComponent ]
 })
 export class AppModule {}

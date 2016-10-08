@@ -1,8 +1,4 @@
-export enum JobState {
-    New,
-    Active,
-    Finished
-}
+import {JobState} from "./job-state";
 
 export class JobDescription {
     jobId : string;

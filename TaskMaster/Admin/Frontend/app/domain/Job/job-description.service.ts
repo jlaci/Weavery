@@ -15,11 +15,20 @@ export class JobDescriptionService {
         return this.http.get(api.url + '/job')
             .toPromise()
             .then(response => response.json() as JobDescription[])
-            .catch(this.handleError);
+            .catch(JobDescriptionService.handleError);
     }
 
-    private handleError(error: any): Promise<any> {
+    getJobDescription(jobId: string) {
+        return this.http.get(api.url + '/job/' + jobId)
+            .toPromise()
+            .then(response => response.json() as JobDescription)
+            .catch(JobDescriptionService.handleError);
+    }
+
+    private static handleError(error: any): Promise<any> {
         console.error('An error occurred', error);
         return Promise.reject(error.message || error);
     }
+
+
 }

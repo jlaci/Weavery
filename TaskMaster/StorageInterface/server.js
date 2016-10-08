@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var router = express.Router();
+var bodyParser = require('body-parser');
 var config = require('./config');
 var mongoose = require('mongoose');
 mongoose.connect(config.mongoUri);
@@ -26,6 +27,8 @@ app.use(function (req, res, next) {
     // Pass to next layer of middleware
     next();
 });
+
+app.use(bodyParser.json());
 app.use('/api/v1', api);
 app.use('/', router);
 app.listen(config.port);

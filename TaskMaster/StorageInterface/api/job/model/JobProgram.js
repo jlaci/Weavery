@@ -9,8 +9,7 @@ var jobProgramSchema = new Schema({
     },
     program : {
         type: String,
-        required: true,
-        unique: false
+        required: true
     }
 });
 

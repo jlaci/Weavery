@@ -15,6 +15,6 @@
         <td>{{job.issuer}}</td>
         <td>{{job.createdDate}}</td>
         <td>{{job.state}}</td>
-        <td><a><i class="fa fa-fw fa-eye"></i>View</a></td>
+        <td><a [routerLink]="['/jobs', job.jobId]"><i class="fa fa-fw fa-eye"></i>Details</a></td>
     </tr>
 </table>

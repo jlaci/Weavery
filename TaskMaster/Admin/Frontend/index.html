@@ -1,16 +1,9 @@
 <html>
     <head>
+        <base href="/">
+
         <title>Task Master</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <!-- Bootstrap -->
-        <script src="node_modules/ng2-bootstrap/bundles/ng2-bootstrap.min.js"></script>
-        <link href="dist/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="style.css">
-
-        <!-- Font Awesome -->
-        <link href="dist/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-
 
         <!-- 1. Load libraries -->
         <!-- Polyfill(s) for older browsers -->
@@ -24,7 +17,13 @@
             System.import('app').catch(function(err){ console.error(err); });
         </script>
 
-        <base href="/">
+        <!-- Bootstrap -->
+        <script src="node_modules/ng2-bootstrap/bundles/ng2-bootstrap.min.js"></script>
+        <link href="dist/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
+
+        <!-- Font Awesome -->
+        <link href="dist/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     </head>
 
     <!-- 3. Display the application -->

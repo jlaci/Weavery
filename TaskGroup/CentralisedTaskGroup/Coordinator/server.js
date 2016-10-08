@@ -1,50 +1,32 @@
 #!/usr/bin/env node
 'use strict';
 
-var http = require('http');
+var server = require('http').createServer();
+var url = require('url');
 var WebSocketServer = require('ws').Server;
-var port = process.env.npm_package_config_port || 9999;
-var server = require('http').createServer().listen(port);
-var ws = new WebSocketServer({ server: server });
-
-var jobMap = {};
-var localJobMap = {
-    get: function(key, cb) {
-        cb(jobMap[key]);
-    },
-    put: function (key, value, cb) {
-        jobMap[key] = value;
-        cb();
-    }
-};
-
-var JobManager = require(".././Jobs/JobManager");
-var jobManager = new JobManager(localJobMap);
+var wss = new WebSocketServer({ server: server });
+var express = require('express');
+var app = express();
+var config = require('./config');
 
 
-ws.on('connection', function(connection) {
-
-    console.log('Coordinator connection');
-
-    connection.on('message', function(messageData) {
-        var message = JSON.parse(messageData);
-        if(message.type === 'JobOffer') {
-            jobManager.sendJob(message.jobDescription, message.jobProgram, message.jobDataParts);
-        } else if(message.type === 'ClientJoin') {
-            //TODO: handle client job assignement
-        }
-
-    });
-
-    connection.on('open', function () {
-
-    });
-
-    connection.on('close', function () {
-
-    });
-
-
+app.use(function (req, res) {
+    res.send({ msg: "hello" });
 });
 
-console.log('listening on port', port);
+wss.on('connection', function connection(ws) {
+    var location = url.parse(ws.upgradeReq.url, true);
+    console.log("WS connection to: " + location.path);
+
+    if(location.path == '/client') {
+        ws.on('message', function incoming(message) {
+            console.log('received: %s', message);
+        });
+    } else {
+        console.log('Unknown endpoint! (' + location.path + ')');
+        ws.close();
+    }
+});
+
+server.on('request', app);
+server.listen(config.port, function () { console.log('Coordinator listening on port ' + server.address().port) });
