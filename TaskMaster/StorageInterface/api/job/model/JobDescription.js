@@ -24,4 +24,5 @@ var jobDescriptionSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('JobDescription', jobDescriptionSchema);
+var Model = mongoose.model('JobDescription', jobDescriptionSchema);
+module.exports = Model;

@@ -14,4 +14,5 @@ var jobProgramSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('JobProgram', jobProgramSchema);
+var Model = mongoose.model('JobProgram', jobProgramSchema);
+module.exports = Model;

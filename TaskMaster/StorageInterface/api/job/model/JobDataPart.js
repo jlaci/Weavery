@@ -8,7 +8,7 @@ var jobDataPartSchema = new Schema({
         unique: true
     },
     data : {
-        type: Mixed,
+        type: Schema.Types.Mixed,
         required: true
     },
     index : {
@@ -18,4 +18,5 @@ var jobDataPartSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('JobDataPart', jobDataPartSchema);
+var Model = mongoose.model('JobDataPart', jobDataPartSchema);
+module.exports = Model;
