@@ -19,13 +19,14 @@ var diagnostics_component_1 = require("./view/Diagnostics/diagnostics.component"
 var http_1 = require("@angular/http");
 var job_details_component_1 = require("./view/Jobs/JobDetails/job-details.component");
 var job_results_component_1 = require("./view/Jobs/JobResults/job-results.component");
+var job_create_component_1 = require("./view/Jobs/JobCreate/job-create.component");
 var AppModule = (function () {
     function AppModule() {
     }
     AppModule = __decorate([
         core_1.NgModule({
             imports: [platform_browser_1.BrowserModule, http_1.HttpModule, app_routes_1.routing],
-            declarations: [app_component_1.AppComponent, control_panel_component_1.ControlPanel, navbar_component_1.Navbar, jobs_component_1.Jobs, diagnostics_component_1.Diagnostics, job_details_component_1.JobDetails, job_results_component_1.JobResults],
+            declarations: [app_component_1.AppComponent, control_panel_component_1.ControlPanel, navbar_component_1.Navbar, jobs_component_1.Jobs, diagnostics_component_1.Diagnostics, job_details_component_1.JobDetails, job_results_component_1.JobResults, job_create_component_1.JobCreate],
             bootstrap: [app_component_1.AppComponent]
         }), 
         __metadata('design:paramtypes', [])

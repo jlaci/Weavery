@@ -5,6 +5,7 @@ var jobs_component_1 = require("./view/Jobs/jobs.component");
 var diagnostics_component_1 = require("./view/Diagnostics/diagnostics.component");
 var job_details_component_1 = require("./view/Jobs/JobDetails/job-details.component");
 var job_results_component_1 = require("./view/Jobs/JobResults/job-results.component");
+var job_create_component_1 = require("./view/Jobs/JobCreate/job-create.component");
 var appRoutes = [
     {
         path: 'control-panel',
@@ -13,6 +14,10 @@ var appRoutes = [
     {
         path: 'jobs',
         component: jobs_component_1.Jobs
+    },
+    {
+        path: 'jobs-create',
+        component: job_create_component_1.JobCreate
     },
     {
         path: 'jobs/:jobId',

@@ -6,6 +6,7 @@ import {Jobs} from "./view/Jobs/jobs.component";
 import {Diagnostics} from "./view/Diagnostics/diagnostics.component";
 import {JobDetails} from "./view/Jobs/JobDetails/job-details.component";
 import {JobResults} from "./view/Jobs/JobResults/job-results.component";
+import {JobCreate} from "./view/Jobs/JobCreate/job-create.component";
 
 const appRoutes: Routes = [
     {
@@ -15,6 +16,10 @@ const appRoutes: Routes = [
     {
         path: 'jobs',
         component: Jobs
+    },
+    {
+        path: 'jobs-create',
+        component: JobCreate
     },
     {
         path: 'jobs/:jobId',

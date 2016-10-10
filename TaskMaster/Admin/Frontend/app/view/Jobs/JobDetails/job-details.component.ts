@@ -10,7 +10,7 @@ import {JobDataPartService} from "../../../domain/Job/job-data-part.service";
 import {JobResultService} from "../../../domain/Job/job-result.service";
 
 @Component({
-    selector: 'jobs',
+    selector: 'job-details',
     templateUrl: 'app/view/Jobs/JobDetails/job-details.html',
     providers: [JobDescriptionService, JobProgramService, JobDataPartService, JobResultService]
 })
