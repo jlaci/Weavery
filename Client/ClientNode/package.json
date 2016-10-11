@@ -3,10 +3,11 @@
     "version": "0.0.0",
     "scripts": {
       "install": "npm-git install",
-      "start": "./node_modules/.bin/browserify ClientNode.js > ClientNode.browser.js; http-server -c-1"
+      "start": "./node_modules/.bin/browserify Client.js > Client.browser.js; http-server -c-1"
     },
     "dependencies": {
-        "kad": "1.5.17"
+      "kad": "1.5.17",
+      "webrtcsupport": "2.2.0"
     },
     "gitDependencies": {
       "kad-webrtc": "https://github.com/handijk/kad-webrtc.git"

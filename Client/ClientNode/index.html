@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-      <script src="ClientNode.browser.js"></script>
+      <script src="Client.browser.js"></script>
     </head>
     <body>
         <h1>Test site</h1>
@@ -12,9 +12,6 @@
           </ul>
         </div>
 
-        <script>
-            var clientNode = new ClientNode();
-        </script>
         <button onclick="clientNode.fetchJobs()">Fetch jobs</button>
         <button onclick="clientNode.executeJob(clientNode.jobs[0])">Execute 1st job</button>
 
