@@ -4,8 +4,7 @@ var Schema = mongoose.Schema;
 var joResultSchema = new Schema({
     jobId : {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     clientId : {
         type: String,

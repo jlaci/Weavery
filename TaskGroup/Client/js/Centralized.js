@@ -1,4 +1,5 @@
-var Message = require('./Message');
+var Message = require('../../Common/Messages/Message');
+var EventEmitter = require('events').EventEmitter;
 
 var CentralizedClient = function(url){
     this.url = url;
@@ -16,36 +17,47 @@ CentralizedClient.prototype = {
         this.ws = new WebSocket(this.url);
 
         this.ws.onerror = function(error) {
-            console.log('onerror', error);
+            console.log('Connection error!', error);
         };
 
         this.ws.onclose = function() {
-            console.log('onclose');
+            console.log('Connection to coordinator closed');
         };
 
         this.ws.onopen = function() {
-            self.ws.emit('open');
+            console.log('Connection to coordinator open');
         };
 
-        this.ws.onmessage = function(message) {
-            if(message.tag == 'jobs') {
-                self.emitter.emit('jobs_result', message.data);
-            } else if(message.tag == 'job_program') {
-                self.emitter.emit('job_program_result', message.data);
-            } else if(message.tag == 'job_data_part') {
-                self.emitter.emit('job_data_part_result', message.data);
-            } else {
-                self.emitter.emit('message', message.data);
+        this.ws.onmessage = function(rawMessage) {
+            if(rawMessage && rawMessage.data) {
+                try {
+                    var message = JSON.parse(rawMessage.data);
+                    message.data = JSON.parse(message.data);
+
+                    if(message.tag == 'jobs_result') {
+                        self.emitter.emit('jobs_result', message.data);
+                    } else if(message.tag == 'job_program_result') {
+                        self.emitter.emit('job_program_result', message.data);
+                    } else if(message.tag == 'job_data_part_result') {
+                        self.emitter.emit('job_data_part_result', message.data);
+                    } else {
+                        self.emitter.emit('message', message.data);
+                    }
+                } catch (e) {
+                    console.log('Error parsing message: ' + e.message)
+                }
             }
+
         };
 
         this.emitter.send = function(message) {
-            self.ws.send(message);
+            self.ws.send(JSON.stringify(message));
         };
     },
 
     uploadJobPartResult: function(jobId, index, data, cb) {
-
+        this.emitter.send(new Message('upload_job_result', {jobId: jobId, index: index, result: data}));
+        cb();
     },
 
     getJobProgram: function(jobId, cb) {

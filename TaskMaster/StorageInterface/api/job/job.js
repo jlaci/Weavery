@@ -84,7 +84,7 @@ app.get('/:jobId/result/:index', function (req, res) {
 });
 
 app.post('/:jobId/result/', function (req, res) {
-    new JobResult(req.body.result).save(function (err) {
+    new JobResult(req.body).save(function (err) {
         console.log(err);
         res.statusCode = 500;
         res.end();
