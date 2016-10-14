@@ -1,6 +1,5 @@
 var express = require('express');
 var app = module.exports = express();
-var JobDescription = require("./../../../../StorageInterface/api/job/model/JobDescription");
 var config = require('./../../config/');
 var request = require('request');
 
