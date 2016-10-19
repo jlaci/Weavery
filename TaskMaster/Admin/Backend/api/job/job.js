@@ -5,7 +5,7 @@ var request = require('request');
 
 function proxy(path) {
     return function resolver(req, res) {
-        request(path, function (error, response, body) {
+        request(path + req.url, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 res.write(body);
                 res.end();

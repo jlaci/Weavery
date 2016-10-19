@@ -31,7 +31,7 @@ var JobResults = (function () {
     JobResults = __decorate([
         core_1.Component({
             selector: 'jobs',
-            templateUrl: 'app/view/Jobs/JobResults/job-results.html',
+            templateUrl: 'app/templates/Jobs/JobResults/job-results.html',
             providers: [job_result_service_1.JobResultService]
         }), 
         __metadata('design:paramtypes', [job_result_service_1.JobResultService, router_1.ActivatedRoute])

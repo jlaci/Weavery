@@ -5,7 +5,7 @@ import {JobResult} from "../../../domain/Job/job-result";
 
 @Component({
     selector: 'jobs',
-    templateUrl: 'app/view/Jobs/JobResults/job-results.html',
+    templateUrl: 'app/templates/Jobs/JobResults/job-results.html',
     providers: [JobResultService]
 })
 

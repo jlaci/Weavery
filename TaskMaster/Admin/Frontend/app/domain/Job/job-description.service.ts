@@ -1,9 +1,11 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {Http, URLSearchParams} from "@angular/http";
 import {JobDescription} from "./job-description";
 import {api} from "../../app.config";
 
 import 'rxjs/add/operator/toPromise';
+import {JobState} from "./job-state";
+import {ArrayParamAppender} from '../Util/ArrayParamAppender';
 
 
 @Injectable()
@@ -11,8 +13,14 @@ export class JobDescriptionService {
 
     constructor(private http: Http) { }
 
-    getJobDescriptions(): Promise<JobDescription[]> {
-        return this.http.get(api.url + '/job')
+    getJobDescriptions(states : JobState[]): Promise<JobDescription[]> {
+        let params: URLSearchParams = new URLSearchParams();
+
+        if(states != null) {
+            ArrayParamAppender.appendArray(params, 'states', states);
+        }
+
+        return this.http.get(api.url + '/job', {search : params})
             .toPromise()
             .then(response => response.json() as JobDescription[])
             .catch(JobDescriptionService.handleError);

@@ -9,23 +9,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var job_description_service_1 = require("../../domain/Job/job-description.service");
 var Jobs = (function () {
-    function Jobs(jobDescriptionService) {
-        this.jobDescriptionService = jobDescriptionService;
-        this.jobDescriptions = [];
+    function Jobs() {
     }
-    Jobs.prototype.ngOnInit = function () {
-        var _this = this;
-        this.jobDescriptionService.getJobDescriptions().then(function (jobDescriptions) { return _this.jobDescriptions = jobDescriptions; });
-    };
     Jobs = __decorate([
         core_1.Component({
             selector: 'jobs',
-            templateUrl: 'app/view/Jobs/jobs.html',
-            providers: [job_description_service_1.JobDescriptionService]
+            templateUrl: 'app/view/Jobs/jobs.html'
         }), 
-        __metadata('design:paramtypes', [job_description_service_1.JobDescriptionService])
+        __metadata('design:paramtypes', [])
     ], Jobs);
     return Jobs;
 }());

@@ -1,19 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {JobDescriptionService} from "../../domain/Job/job-description.service";
-import {JobDescription} from "../../domain/Job/job-description";
+import {Component} from '@angular/core';
 
 @Component({
     selector: 'jobs',
-    templateUrl: 'app/view/Jobs/jobs.html',
-    providers: [JobDescriptionService]
+    templateUrl: 'app/view/Jobs/jobs.html'
 })
 
-export class Jobs implements OnInit{
-    jobDescriptions : JobDescription[] = [];
+export class Jobs{
 
-    constructor(private jobDescriptionService : JobDescriptionService) { }
-
-    ngOnInit(): void {
-        this.jobDescriptionService.getJobDescriptions().then(jobDescriptions => this.jobDescriptions = jobDescriptions);
-    }
 }

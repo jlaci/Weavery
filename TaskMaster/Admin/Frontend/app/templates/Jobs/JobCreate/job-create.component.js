@@ -19,7 +19,7 @@ var JobCreate = (function () {
     JobCreate = __decorate([
         core_1.Component({
             selector: 'job-create',
-            templateUrl: 'app/view/Jobs/JobCreate/job-create.html',
+            templateUrl: 'app/templates/Jobs/JobCreate/job-create.html',
             providers: [job_description_service_1.JobDescriptionService, job_program_service_1.JobProgramService, job_data_part_service_1.JobDataPartService, job_result_service_1.JobResultService]
         }), 
         __metadata('design:paramtypes', [])

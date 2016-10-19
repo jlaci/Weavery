@@ -2,11 +2,11 @@ import { ModuleWithProviders }  from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import {ControlPanel} from "./view/ControlPanel/control-panel.component";
-import {Jobs} from "./view/Jobs/jobs.component";
 import {Diagnostics} from "./view/Diagnostics/diagnostics.component";
-import {JobDetails} from "./view/Jobs/JobDetails/job-details.component";
-import {JobResults} from "./view/Jobs/JobResults/job-results.component";
-import {JobCreate} from "./view/Jobs/JobCreate/job-create.component";
+import {JobDetails} from "./templates/Jobs/JobDetails/job-details.component";
+import {JobResults} from "./templates/Jobs/JobResults/job-results.component";
+import {JobCreate} from "./templates/Jobs/JobCreate/job-create.component";
+import {Jobs} from "./view/Jobs/jobs.component";
 
 const appRoutes: Routes = [
     {

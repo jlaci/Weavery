@@ -12,12 +12,17 @@ var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
 var app_config_1 = require("../../app.config");
 require('rxjs/add/operator/toPromise');
+var ArrayParamAppender_1 = require('../Util/ArrayParamAppender');
 var JobDescriptionService = (function () {
     function JobDescriptionService(http) {
         this.http = http;
     }
-    JobDescriptionService.prototype.getJobDescriptions = function () {
-        return this.http.get(app_config_1.api.url + '/job')
+    JobDescriptionService.prototype.getJobDescriptions = function (states) {
+        var params = new http_1.URLSearchParams();
+        if (states != null) {
+            ArrayParamAppender_1.ArrayParamAppender.appendArray(params, 'states', states);
+        }
+        return this.http.get(app_config_1.api.url + '/job', { search: params })
             .toPromise()
             .then(function (response) { return response.json(); })
             .catch(JobDescriptionService.handleError);
