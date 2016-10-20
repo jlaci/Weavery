@@ -1,10 +1,14 @@
 var express = require('express');
 var app = express();
 var router = express.Router();
+var bodyParser = require('body-parser');
 var config = require('./config');
-var request = require('request');
+var mongoose = require('mongoose');
+mongoose.connect(config.mongoUri);
 
 var api = require('./api');
+
+app.use(bodyParser({limit: '50mb'}));
 
 app.use(function (req, res, next) {
 
@@ -24,25 +28,10 @@ app.use(function (req, res, next) {
     // Pass to next layer of middleware
     next();
 });
+
+app.use(bodyParser.json());
 app.use('/api/v1', api);
 app.use('/', router);
+app.listen(config.port);
 
-
-function validConfig(taskMasterConfig) {
-    return taskMasterConfig.port && taskMasterConfig.storageUrl;
-}
-
-request(config.configUrl + '/api/v1/system/taskmaster/config', function (error, response, body) {
-
-    var taskMasterConfig = JSON.parse(body);
-    if (!error && response.statusCode == 200 && validConfig(taskMasterConfig)) {
-        config.port = taskMasterConfig.port;
-        config.storageUrl = taskMasterConfig.storageUrl;
-        app.listen(config.port);
-    } else {
-        throw "Failed to configure TaskMaster Admin Backend!";
-    }
-});
-
-
-console.log('TaskMaster started on ' + config.port + ' port!');
+console.log('ConfigurationManager started on ' + config.port + ' port!');

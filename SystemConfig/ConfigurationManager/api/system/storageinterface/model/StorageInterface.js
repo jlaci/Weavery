@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var taskGroupSchema = new Schema({
+var storageInterfaceSchema = new Schema({
     id : {
         type: String,
         required: true,
@@ -12,11 +12,11 @@ var taskGroupSchema = new Schema({
         required: true,
         unique: false
     },
-    workingMode : {
+    mongoUrl : {
         type: String,
-        required: true,
-        enum: ['Distributed', 'Hybrid', 'Centralised']
+        required: true
     }
 });
 
-module.exports = mongoose.model('TaskGroup', taskGroupSchema);
+var Model = mongoose.model('StorageInterface', storageInterfaceSchema);
+module.exports = Model;

@@ -1,16 +1,19 @@
 var express = require('express');
 var app = module.exports = express();
-var TaskGroup = require('./model/TaskGroup');
-var coordinator = require('./coordinator/coordinator');
+var config = require('./../../config/');
+var request = require('request');
 
-app.get('/', function (req, res) {
-    TaskGroup.findOne({}, function (err, taskGroup) {
-        if(!err) {
-            res.json(taskGroup);
+function proxy(req, res) {
+    request(config.configUrl + req.originalUrl, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            res.write(body);
+            res.end();
         } else {
-            throw err;
+            console.log(response.statusCode + ' : ' + error);
+            res.statusCode = response.statusCode;
+            res.end();
         }
     });
-});
+}
 
-app.use('/coordinator', coordinator);
+app.get('/', proxy);
