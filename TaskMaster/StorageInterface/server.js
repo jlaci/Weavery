@@ -8,6 +8,7 @@ mongoose.connect(config.mongoUri);
 
 var api = require('./api');
 
+app.use(bodyParser({limit: '50mb'}));
 
 app.use(function (req, res, next) {
 

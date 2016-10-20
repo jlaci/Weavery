@@ -52,7 +52,7 @@
                 </tr>
                 <tr *ngFor="let dataPart of jobDataParts">
                     <td><b>{{dataPart.index}}</b></td>
-                    <td>{{dataPart.data}}</td>
+                    <td>{{dataPart.data | json}}</td>
                     <td>{{jobResults[dataPart.index] == null ? 0 : jobResults[dataPart.index].length}}</td>
                     <td>
                         <a [routerLink]="['results', dataPart.index]"><i class="fa fa-fw fa-eye"></i>View</a>

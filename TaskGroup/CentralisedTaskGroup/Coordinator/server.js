@@ -39,12 +39,14 @@ wss.on('connection', function connection(ws) {
 
     if(location.path == '/client') {
         ws.on('message', function incoming(rawMessage) {
-            console.log('received: %s', rawMessage);
+            //console.log('received: %s', rawMessage);
             var message;
 
             if(rawMessage) {
                 try {
                     message = JSON.parse(rawMessage);
+
+                    console.time("Client: " + clientId + " message " + message.tag);
 
                     if(message.tag == 'get_job_program') {
                         sendRequest(config.storageUrl + '/api/v1/job/' + message.data.jobId + '/program', sendResponse('job_program_result'));
@@ -70,6 +72,8 @@ wss.on('connection', function connection(ws) {
                     } else {
                         console.log('Unknown message type ' + message)
                     }
+
+                    console.timeEnd("Client: " + clientId + " message " + message.tag);
                 }catch (e) {
                     console.log('Error processing message', e);
                 }

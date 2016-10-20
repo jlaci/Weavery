@@ -1,5 +1,5 @@
 export class JobDataPart {
     jobId : string;
-    data : string;
+    data : any;
     index: number;
 }

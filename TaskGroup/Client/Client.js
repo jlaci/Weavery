@@ -19,8 +19,12 @@ WeaveryClient.prototype = {
     workingMode: 'Centralized',
 
     executeJobPart: function(job, index, count, data, cb) {
-        var program = new Function(['data', 'index'], job.program);
-        var result = program(data);
+        console.time("job: " + job.jobId + " jobPart: " + index);
+        var program = new Function(['index', 'data'], job.program);
+        var result = program(index, data);
+        console.timeEnd("job: " + job.jobId + " jobPart: " + index);
+
+
         this.clientImpl.uploadJobPartResult(job.jobId, index, result, function () {
             cb(job, (index + 1) % job.size, count + 1);
         });
@@ -42,7 +46,7 @@ WeaveryClient.prototype = {
             };
 
             //Select a random starting point and begin executing
-            var startingPoint = Math.floor(Math.random() * job.size);
+            var startingPoint = 0; //Math.floor(Math.random() * job.size);
             jobPartStep(job, startingPoint, 0);
         });
     },

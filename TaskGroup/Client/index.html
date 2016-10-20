@@ -13,7 +13,17 @@
         </div>
 
         <button onclick="weaveryClient.fetchJobs()">Fetch jobs</button>
-        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[0])">Execute 1st job</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[0])">Execute job 1</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[1])">Execute job 2</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[2])">Execute job 3</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[3])">Execute job 4</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[4])">Execute job 5</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[5])">Execute job 6</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[6])">Execute job 7</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[7])">Execute job 8</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[8])">Execute job 9</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[9])">Execute job 10</button>
+        <button onclick="weaveryClient.executeJob(weaveryClient.jobs[10])">Execute job 11</button>
 
         <h1>Jobs</h1>
         <div id="jobs">
@@ -23,19 +33,6 @@
         <div id="log">
         </div>
 
-        <script>
-            window.console = {
-                log: function(str) {
-                    var node = document.createElement("div");
-                    node.appendChild(document.createTextNode(str));
-                    document.getElementById("log").appendChild(node);
-                },
-                jobs: function(str) {
-                    var node = document.createElement("div");
-                    node.appendChild(document.createTextNode(str));
-                    document.getElementById("jobs").appendChild(node);
-                }
-            }
-        </script>
+
     </body>
 </html>
