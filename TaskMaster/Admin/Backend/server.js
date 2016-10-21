@@ -27,7 +27,6 @@ app.use(function (req, res, next) {
 app.use('/api/v1', api);
 app.use('/', router);
 
-
 function validConfig(taskMasterConfig) {
     return taskMasterConfig.port && taskMasterConfig.storageUrl;
 }
@@ -39,10 +38,9 @@ request(config.configUrl + '/api/v1/system/taskmaster/config', function (error, 
         config.port = taskMasterConfig.port;
         config.storageUrl = taskMasterConfig.storageUrl;
         app.listen(config.port);
+        console.log('TaskMaster started on ' + config.port + ' port!');
     } else {
         throw "Failed to configure TaskMaster Admin Backend!";
     }
 });
 
-
-console.log('TaskMaster started on ' + config.port + ' port!');

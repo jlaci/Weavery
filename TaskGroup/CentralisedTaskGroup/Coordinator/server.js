@@ -53,7 +53,7 @@ wss.on('connection', function connection(ws) {
                     } else if(message.tag == 'get_job_data_part') {
                         sendRequest(config.storageUrl + '/api/v1/job/' + message.data.jobId + '/data/' + message.data.index, sendResponse('job_data_part_result'));
                     } else if(message.tag == 'get_jobs') {
-                        sendRequest(config.storageUrl + '/api/v1/job/', sendResponse('jobs_result'));
+                        sendRequest(config.storageUrl + '/api/v1/job?states[0]=Active', sendResponse('jobs_result'));
                     } else if(message.tag == 'upload_job_result') {
 
                         message.data.clientId = clientId;
@@ -87,4 +87,24 @@ wss.on('connection', function connection(ws) {
 });
 
 server.on('request', app);
-server.listen(config.port, function () { console.log('Coordinator listening on port ' + server.address().port) });
+
+
+function validConfig(coordinatorConfig) {
+    return coordinatorConfig.port && coordinatorConfig.storageUrl;
+}
+
+request(config.configUrl + '/api/v1/system/coordinator/config', function (error, response, body) {
+
+    var coordinatorConfig = JSON.parse(body);
+    if (!error && response.statusCode == 200 && validConfig(coordinatorConfig)) {
+        config.port = coordinatorConfig.port;
+        config.storageUrl = coordinatorConfig.storageUrl;
+
+        server.listen(config.port, function () {
+            console.log('Coordinator listening on port ' + server.address().port)
+        });
+    } else {
+        throw "Failed to configure Coordinator!";
+    }
+});
+

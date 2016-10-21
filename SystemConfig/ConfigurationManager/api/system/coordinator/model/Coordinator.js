@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var storageInterfaceSchema = new Schema({
+var coordinatorSchema = new Schema({
     id : {
         type: String,
         required: true,
@@ -12,10 +12,6 @@ var storageInterfaceSchema = new Schema({
         required: true,
         unique: true
     },
-    mongoUri : {
-        type: String,
-        required: true
-    },
     port : {
         type: Number,
         min: 1000,
@@ -23,5 +19,5 @@ var storageInterfaceSchema = new Schema({
     }
 });
 
-var Model = mongoose.model('StorageInterface', storageInterfaceSchema);
+var Model = mongoose.model('Coordinator', coordinatorSchema);
 module.exports = Model;

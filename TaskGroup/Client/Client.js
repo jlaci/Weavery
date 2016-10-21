@@ -3,13 +3,15 @@ var DistributedClient = require('./js/Distributed.js');
 var CentralizedClient = require('./js/Centralized.js');
 
 
+var centralizedLocation = 'ws://localhost:8003/client';
+
 var WeaveryClient = function() {
    if(false && webrtcSupport.support && webrtcSupport.supportDataChannel && webrtcSupport.PeerConnection) {
        console.log("Running in WebRTC capable browser, starting distributed client.");
        this.clientImpl = new DistributedClient();
    } else {
        console.log("WebRTC is not supported in the browser, starting centralized client.");
-       this.clientImpl = new CentralizedClient('ws://localhost:8002/client');
+       this.clientImpl = new CentralizedClient(centralizedLocation);
    }
 };
 
@@ -23,7 +25,6 @@ WeaveryClient.prototype = {
         var program = new Function(['index', 'data'], job.program);
         var result = program(index, data);
         console.timeEnd("job: " + job.jobId + " jobPart: " + index);
-
 
         this.clientImpl.uploadJobPartResult(job.jobId, index, result, function () {
             cb(job, (index + 1) % job.size, count + 1);
@@ -46,7 +47,7 @@ WeaveryClient.prototype = {
             };
 
             //Select a random starting point and begin executing
-            var startingPoint = 0; //Math.floor(Math.random() * job.size);
+            var startingPoint = Math.floor(Math.random() * job.size);
             jobPartStep(job, startingPoint, 0);
         });
     },
