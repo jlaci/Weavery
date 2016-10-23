@@ -1,0 +1,20 @@
+<table class="table">
+    <tr>
+        <th>Task ID</th>
+        <th>Size</th>
+        <th>Issuer</th>
+        <th>Creation date</th>
+        <th>Priority</th>
+        <th>State</th>
+        <th>Operations</th>
+    </tr>
+    <tr *ngFor="let task of taskDescriptions">
+        <td>{{task.taskId}}</td>
+        <td>{{task.size}}</td>
+        <td>{{task.issuer}}</td>
+        <td>{{task.createdDate}}</td>
+        <td>{{task.priority}}</td>
+        <td>{{task.state}}</td>
+        <td><a [routerLink]="['/tasks', task.taskId]"><i class="fa fa-fw fa-eye"></i>Details</a></td>
+    </tr>
+</table>

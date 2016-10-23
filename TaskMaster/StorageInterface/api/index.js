@@ -1,7 +1,7 @@
 var express = require('express');
 var app = module.exports = express();
 
-var job = require('./job/job');
+var task = require('./task/task');
 
 app.get('/', function(req, res) {
     res.json({
@@ -9,4 +9,4 @@ app.get('/', function(req, res) {
     });
 });
 
-app.use('/job', job);
+app.use('/task', task);

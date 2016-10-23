@@ -1,0 +1,17 @@
+<a [routerLink]="['/tasks', taskId]"><< Back to task details</a>
+<h3>Results for item {{index}}</h3>
+<hr/>
+<table class="table text-center">
+    <tr>
+        <th class="text-center">Client ID</th>
+        <th class="text-center">Result</th>
+        <th class="text-center">Operations</th>
+    </tr>
+    <tr *ngFor="let result of taskResults">
+        <td>{{result.clientId}}</td>
+        <td>{{result.result}}</td>
+        <td>
+            <a><i class="fa fa-fw fa-remove"></i>Delete</a>
+        </td>
+    </tr>
+</table>

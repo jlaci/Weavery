@@ -17,47 +17,47 @@ var WeaveryClient = function() {
 
 WeaveryClient.prototype = {
     clientImpl: null,
-    jobs: [],
+    tasks: [],
     workingMode: 'Centralized',
 
-    executeJobPart: function(job, index, count, data, cb) {
-        console.time("job: " + job.jobId + " jobPart: " + index);
-        var program = new Function(['index', 'data'], job.program);
+    executeTaskPart: function(task, index, count, data, cb) {
+        console.time("task: " + task.taskId + " taskPart: " + index);
+        var program = new Function(['index', 'data'], task.program);
         var result = program(index, data);
-        console.timeEnd("job: " + job.jobId + " jobPart: " + index);
+        console.timeEnd("task: " + task.taskId + " taskPart: " + index);
 
-        this.clientImpl.uploadJobPartResult(job.jobId, index, result, function () {
-            cb(job, (index + 1) % job.size, count + 1);
+        this.clientImpl.uploadTaskPartResult(task.taskId, index, result, function () {
+            cb(task, (index + 1) % task.size, count + 1);
         });
     },
 
-    executeJob: function(job) {
+    executeTask: function(task) {
         var self = this;
 
-        this.clientImpl.getJobProgram(job.jobId, function (data) {
-            job.program = data.program;
+        this.clientImpl.getTaskProgram(task.taskId, function (data) {
+            task.program = data.program;
 
-            //Execute the job parts
-            var jobPartStep = function(job, index, count) {
-                if(count < job.size) {
-                    self.clientImpl.getJobDataPart(job.jobId, index, function (jobDataPart) {
-                        self.executeJobPart(job, index, count, jobDataPart.data, jobPartStep);
+            //Execute the task parts
+            var taskPartStep = function(task, index, count) {
+                if(count < task.size) {
+                    self.clientImpl.getTaskDataPart(task.taskId, index, function (taskDataPart) {
+                        self.executeTaskPart(task, index, count, taskDataPart.data, taskPartStep);
                     });
                 }
             };
 
             //Select a random starting point and begin executing
-            var startingPoint = Math.floor(Math.random() * job.size);
-            jobPartStep(job, startingPoint, 0);
+            var startingPoint = Math.floor(Math.random() * task.size);
+            taskPartStep(task, startingPoint, 0);
         });
     },
 
-    fetchJobs: function() {
+    fetchTasks: function() {
         var self = this;
 
-        this.clientImpl.fetchJobs(function (jobs) {
-            self.jobs = jobs;
-            document.getElementById("jobs").innerHTML = JSON.stringify(jobs);
+        this.clientImpl.fetchTasks(function (tasks) {
+            self.tasks = tasks;
+            document.getElementById("tasks").innerHTML = JSON.stringify(tasks);
         });
     }
 };

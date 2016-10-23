@@ -2,7 +2,7 @@ var express = require('express');
 var app = module.exports = express();
 
 var taskgroup = require('./taskgroup/taskgroup');
-var job = require('./job/job');
+var task = require('./task/task');
 
 app.get('/', function(req, res) {
     res.json({
@@ -11,4 +11,4 @@ app.get('/', function(req, res) {
 });
 
 app.use('/taskgroup', taskgroup);
-app.use('/job', job);
+app.use('/task', task);

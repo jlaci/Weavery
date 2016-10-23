@@ -48,24 +48,24 @@ wss.on('connection', function connection(ws) {
 
                     console.time("Client: " + clientId + " message " + message.tag);
 
-                    if(message.tag == 'get_job_program') {
-                        sendRequest(config.storageUrl + '/api/v1/job/' + message.data.jobId + '/program', sendResponse('job_program_result'));
-                    } else if(message.tag == 'get_job_data_part') {
-                        sendRequest(config.storageUrl + '/api/v1/job/' + message.data.jobId + '/data/' + message.data.index, sendResponse('job_data_part_result'));
-                    } else if(message.tag == 'get_jobs') {
-                        sendRequest(config.storageUrl + '/api/v1/job?states[0]=Active', sendResponse('jobs_result'));
-                    } else if(message.tag == 'upload_job_result') {
+                    if(message.tag == 'get_task_program') {
+                        sendRequest(config.storageUrl + '/api/v1/task/' + message.data.taskId + '/program', sendResponse('task_program_result'));
+                    } else if(message.tag == 'get_task_data_part') {
+                        sendRequest(config.storageUrl + '/api/v1/task/' + message.data.taskId + '/data/' + message.data.index, sendResponse('task_data_part_result'));
+                    } else if(message.tag == 'get_tasks') {
+                        sendRequest(config.storageUrl + '/api/v1/task?states[0]=Active', sendResponse('tasks_result'));
+                    } else if(message.tag == 'upload_task_result') {
 
                         message.data.clientId = clientId;
                         var options = {
-                            uri: config.storageUrl + '/api/v1/job/' + message.data.jobId + '/result/',
+                            uri: config.storageUrl + '/api/v1/task/' + message.data.taskId + '/result/',
                             method: 'POST',
                             json: message.data
                         };
 
                         request(options, function (error, response) {
                             if (error || response.statusCode != 200) {
-                                console.log('Failed to save JobResult');
+                                console.log('Failed to save TaskResult');
                             }
                         });
 

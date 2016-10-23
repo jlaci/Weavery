@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {TaskGroup, WorkingMode} from "../../domain/TaskGroup/task-group";
 import {TaskGroupService} from "../../domain/TaskGroup/task-group.service";
-import {JobState} from "../../domain/Job/job-state";
+import {TaskState} from "../../domain/Task/task-state";
 
 
 @Component({
@@ -12,7 +12,7 @@ import {JobState} from "../../domain/Job/job-state";
 
 export class ControlPanel implements OnInit{
 
-    public JobState = JobState;
+    public TaskState = TaskState;
 
     taskGroup : TaskGroup = new TaskGroup('', WorkingMode.Centralised);
 

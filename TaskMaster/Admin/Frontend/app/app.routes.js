@@ -2,30 +2,30 @@
 var router_1 = require('@angular/router');
 var control_panel_component_1 = require("./view/ControlPanel/control-panel.component");
 var diagnostics_component_1 = require("./view/Diagnostics/diagnostics.component");
-var job_details_component_1 = require("./templates/Jobs/JobDetails/job-details.component");
-var job_results_component_1 = require("./templates/Jobs/JobResults/job-results.component");
-var job_create_component_1 = require("./templates/Jobs/JobCreate/job-create.component");
-var jobs_component_1 = require("./view/Jobs/jobs.component");
+var task_details_component_1 = require("./templates/Tasks/TaskDetails/task-details.component");
+var task_results_component_1 = require("./templates/Tasks/TaskResults/task-results.component");
+var task_create_component_1 = require("./templates/Tasks/TaskCreate/task-create.component");
+var tasks_component_1 = require("./view/Tasks/tasks.component");
 var appRoutes = [
     {
         path: 'control-panel',
         component: control_panel_component_1.ControlPanel
     },
     {
-        path: 'jobs',
-        component: jobs_component_1.Jobs
+        path: 'tasks',
+        component: tasks_component_1.Tasks
     },
     {
-        path: 'jobs-create',
-        component: job_create_component_1.JobCreate
+        path: 'tasks-create',
+        component: task_create_component_1.TaskCreate
     },
     {
-        path: 'jobs/:jobId',
-        component: job_details_component_1.JobDetails
+        path: 'tasks/:taskId',
+        component: task_details_component_1.TaskDetails
     },
     {
-        path: 'jobs/:jobId/results/:index',
-        component: job_results_component_1.JobResults
+        path: 'tasks/:taskId/results/:index',
+        component: task_results_component_1.TaskResults
     },
     {
         path: 'diagnostics',

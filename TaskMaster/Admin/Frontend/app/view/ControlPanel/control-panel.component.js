@@ -11,11 +11,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var task_group_1 = require("../../domain/TaskGroup/task-group");
 var task_group_service_1 = require("../../domain/TaskGroup/task-group.service");
-var job_state_1 = require("../../domain/Job/job-state");
+var task_state_1 = require("../../domain/Task/task-state");
 var ControlPanel = (function () {
     function ControlPanel(taskGroupService) {
         this.taskGroupService = taskGroupService;
-        this.JobState = job_state_1.JobState;
+        this.TaskState = task_state_1.TaskState;
         this.taskGroup = new task_group_1.TaskGroup('', task_group_1.WorkingMode.Centralised);
     }
     ControlPanel.prototype.ngOnInit = function () {

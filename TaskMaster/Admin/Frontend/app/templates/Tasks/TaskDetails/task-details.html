@@ -1,0 +1,81 @@
+<a [routerLink]="['/tasks']"><< Back to tasks</a>
+<h3>Task details for {{taskDescription.taskId}}</h3>
+<hr/>
+<div class="row">
+    <div class="col-lg-3">
+        <div class="panel panel-primary">
+
+            <div class="panel-heading">
+                <h3 class="panel-title">Task description</h3>
+            </div>
+            <div class="panel-body">
+                <dl>
+                    <dt>Task ID</dt>
+                    <dd>{{taskDescription.taskId}}</dd>
+                    <dt>Size</dt>
+                    <dd>{{taskDescription.size}}</dd>
+                    <dt>Issuer</dt>
+                    <dd>{{taskDescription.issuer}}</dd>
+                    <dt>Creation date</dt>
+                    <dd>{{taskDescription.createdDate}}</dd>
+                    <dt>State</dt>
+                    <dd>{{taskDescription.state}}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Task program</h3>
+            </div>
+            <div class="panel-body">
+                <code>
+                    function(index, data) &#123;
+                        {{taskProgram.program}}
+                    &#125;
+                </code>
+            </div>
+        </div>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Data/results</h3>
+            </div>
+            <table class="table text-center">
+                <tr>
+                    <th class="text-center">Index</th>
+                    <th class="text-center">Data</th>
+                    <th class="text-center">Results count</th>
+                    <th class="text-center">Operations</th>
+                </tr>
+                <tr *ngFor="let dataPart of taskDataParts">
+                    <td><b>{{dataPart.index}}</b></td>
+                    <td>{{dataPart.data | json}}</td>
+                    <td>{{taskResults[dataPart.index] == null ? 0 : taskResults[dataPart.index].length}}</td>
+                    <td>
+                        <a [routerLink]="['results', dataPart.index]"><i class="fa fa-fw fa-eye"></i>View</a>
+                        <a><i class="fa fa-fw fa-remove"></i>Clear</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Operations</h3>
+            </div>
+            <div class="panel-body">
+                <a><i class="fa fa-fw fa-remove"></i>Clear results</a>
+                <br />
+                <a *ngIf="taskDescription.state == TaskState[TaskState.New]"><i class="fa fa-fw fa-check"></i>Activate</a>
+                <a *ngIf="taskDescription.state == TaskState[TaskState.Active]"><i class="fa fa-fw fa-stop"></i>Deactivate</a>
+                <a *ngIf="taskDescription.state == TaskState[TaskState.Finished]"><i class="fa fa-fw fa-remove"></i>Delete</a>
+
+            </div>
+        </div>
+    </div>
+</div>

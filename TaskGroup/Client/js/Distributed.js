@@ -49,8 +49,8 @@ DistributedClient.prototype = {
         });
     },
 
-    uploadJobPartResult: function(jobId, index, data, cb) {
-        this.dht.put(jobId + '_result_' + index, data, function (err) {
+    uploadTaskPartResult: function(taskId, index, data, cb) {
+        this.dht.put(taskId + '_result_' + index, data, function (err) {
             if(err) {
                 console.log(err);
             } else {
@@ -59,8 +59,8 @@ DistributedClient.prototype = {
         });
     },
 
-    getJobProgram: function(jobId, cb) {
-        this.dht.get(jobId + '_program', function (err, value) {
+    getTaskProgram: function(taskId, cb) {
+        this.dht.get(taskId + '_program', function (err, value) {
             if (err) {
                 console.log(err);
             } else {
@@ -69,8 +69,8 @@ DistributedClient.prototype = {
         });
     },
 
-    getJobDataPart: function(jobId, index, cb) {
-        this.dht.get(jobId + '_datapart_' + index, function (err, data) {
+    getTaskDataPart: function(taskId, index, cb) {
+        this.dht.get(taskId + '_datapart_' + index, function (err, data) {
             if(err) {
                 console.log(err);
             } else {
@@ -79,14 +79,14 @@ DistributedClient.prototype = {
         });
     },
 
-    fetchJobs: function(cb) {
-        this.dht.get('jobs', function(err, value) {
+    fetchTasks: function(cb) {
+        this.dht.get('tasks', function(err, value) {
             if (value === undefined) {
                 cb([]);
-                console.jobs("No job found!");
+                console.tasks("No task found!");
             } else {
                 cb(value);
-                console.jobs("Found " + value.length + " jobs");
+                console.tasks("Found " + value.length + " jobs");
             }
         });
     }

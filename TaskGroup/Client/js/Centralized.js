@@ -34,12 +34,12 @@ CentralizedClient.prototype = {
                     var message = JSON.parse(rawMessage.data);
                     message.data = JSON.parse(message.data);
 
-                    if(message.tag == 'jobs_result') {
-                        self.emitter.emit('jobs_result', message.data);
-                    } else if(message.tag == 'job_program_result') {
-                        self.emitter.emit('job_program_result', message.data);
-                    } else if(message.tag == 'job_data_part_result') {
-                        self.emitter.emit('job_data_part_result', message.data);
+                    if(message.tag == 'tasks_result') {
+                        self.emitter.emit('tasks_result', message.data);
+                    } else if(message.tag == 'task_program_result') {
+                        self.emitter.emit('task_program_result', message.data);
+                    } else if(message.tag == 'task_data_part_result') {
+                        self.emitter.emit('task_data_part_result', message.data);
                     } else {
                         self.emitter.emit('message', message.data);
                     }
@@ -55,31 +55,31 @@ CentralizedClient.prototype = {
         };
     },
 
-    uploadJobPartResult: function(jobId, index, data, cb) {
-        this.emitter.send(new Message('upload_job_result', {jobId: jobId, index: index, result: data}));
+    uploadTaskPartResult: function(taskId, index, data, cb) {
+        this.emitter.send(new Message('upload_task_result', {taskId: taskId, index: index, result: data}));
         cb();
     },
 
-    getJobProgram: function(jobId, cb) {
+    getTaskProgram: function(taskId, cb) {
         var self = this;
-        self.emitter.send(new Message('get_job_program', {jobId: jobId}));
-        self.emitter.once('job_program_result', function (data) {
+        self.emitter.send(new Message('get_task_program', {taskId: taskId}));
+        self.emitter.once('task_program_result', function (data) {
            cb(data);
         });
     },
 
-    getJobDataPart: function(jobId, index, cb) {
+    getTaskDataPart: function(taskId, index, cb) {
         var self = this;
-        self.emitter.send(new Message('get_job_data_part', {jobId: jobId, index: index}));
-        self.emitter.once('job_data_part_result', function (data) {
+        self.emitter.send(new Message('get_task_data_part', {taskId: taskId, index: index}));
+        self.emitter.once('task_data_part_result', function (data) {
             cb(data);
         });
     },
 
-    fetchJobs: function(cb) {
+    fetchTasks: function(cb) {
         var self = this;
-        self.emitter.send(new Message('get_jobs'));
-        self.emitter.once('jobs_result', function (data) {
+        self.emitter.send(new Message('get_tasks'));
+        self.emitter.once('tasks_result', function (data) {
             cb(data);
         });
     }

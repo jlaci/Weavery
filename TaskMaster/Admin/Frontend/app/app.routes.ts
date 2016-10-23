@@ -3,10 +3,11 @@ import { Routes, RouterModule } from '@angular/router';
 
 import {ControlPanel} from "./view/ControlPanel/control-panel.component";
 import {Diagnostics} from "./view/Diagnostics/diagnostics.component";
-import {JobDetails} from "./templates/Jobs/JobDetails/job-details.component";
-import {JobResults} from "./templates/Jobs/JobResults/job-results.component";
-import {JobCreate} from "./templates/Jobs/JobCreate/job-create.component";
-import {Jobs} from "./view/Jobs/jobs.component";
+import {TaskDetails} from "./templates/Tasks/TaskDetails/task-details.component";
+import {TaskResults} from "./templates/Tasks/TaskResults/task-results.component";
+import {TaskCreate} from "./templates/Tasks/TaskCreate/task-create.component";
+import {Tasks} from "./view/Tasks/tasks.component";
+
 
 const appRoutes: Routes = [
     {
@@ -14,20 +15,20 @@ const appRoutes: Routes = [
         component: ControlPanel
     },
     {
-        path: 'jobs',
-        component: Jobs
+        path: 'tasks',
+        component: Tasks
     },
     {
-        path: 'jobs-create',
-        component: JobCreate
+        path: 'tasks-create',
+        component: TaskCreate
     },
     {
-        path: 'jobs/:jobId',
-        component: JobDetails
+        path: 'tasks/:taskId',
+        component: TaskDetails
     },
     {
-        path: 'jobs/:jobId/results/:index',
-        component: JobResults
+        path: 'tasks/:taskId/results/:index',
+        component: TaskResults
     },
     {
         path: 'diagnostics',
