@@ -10,6 +10,10 @@ var taskResultSchema = new Schema({
         type: String,
         required: true
     },
+    connectionId : {
+        type: String,
+        required: true
+    },
     result : {
         type: Schema.Types.Mixed,
         required: true
