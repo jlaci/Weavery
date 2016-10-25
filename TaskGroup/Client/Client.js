@@ -6,7 +6,7 @@ var CentralizedClient = require('./js/Centralized.js');
 var centralizedLocation = 'ws://localhost:8003/client';
 
 var WeaveryClient = function() {
-   if(false && webrtcSupport.support && webrtcSupport.supportDataChannel && webrtcSupport.PeerConnection) {
+   if(webrtcSupport.support && webrtcSupport.supportDataChannel && webrtcSupport.PeerConnection) {
        console.log("Running in WebRTC capable browser, starting distributed client.");
        this.clientImpl = new DistributedClient();
    } else {

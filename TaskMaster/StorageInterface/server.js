@@ -12,9 +12,10 @@ var api = require('./api');
 app.use(bodyParser({limit: '50mb'}));
 
 app.use(function (req, res, next) {
+    var origin = req.headers.origin;    //TODO: not secure, use pre selected origins
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', origin);
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');

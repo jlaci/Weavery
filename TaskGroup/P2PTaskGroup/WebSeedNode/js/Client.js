@@ -1,5 +1,5 @@
-var TaskManager = require("../.././TaskManager");
+var TaskManager = require("./TaskManager");
 var SeedNode = require("./WebSeedNode");
 
-var jobMap = new SeedNode();
-window.jobManager = new TaskManager(jobMap);
+var taskMap = new SeedNode();
+window.taskManager = new TaskManager(taskMap);
