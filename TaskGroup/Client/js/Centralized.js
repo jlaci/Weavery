@@ -11,6 +11,7 @@ CentralizedClient.prototype = {
     url: '',
     ws: null,
     emitter: new EventEmitter(),
+    id: '',
 
     startClient: function () {
         var self = this;
@@ -34,6 +35,7 @@ CentralizedClient.prototype = {
                     var message = JSON.parse(rawMessage.data);
                     message.data = JSON.parse(message.data);
 
+                    if(message.tag = '')
                     if(message.tag == 'tasks_result') {
                         self.emitter.emit('tasks_result', message.data);
                     } else if(message.tag == 'task_program_result') {

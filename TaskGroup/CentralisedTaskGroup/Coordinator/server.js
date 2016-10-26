@@ -36,6 +36,7 @@ wss.on('connection', function connection(ws) {
     var clientId = uuid.v4();   //TODO: send to client for storage
     var location = url.parse(ws.upgradeReq.url, true);
     console.log("WS connection to: " + location.path + " assigning ClientID" + clientId);
+    sendResponse('client_join')(clientId);
 
     if(location.path == '/client') {
         ws.on('message', function incoming(rawMessage) {
@@ -57,6 +58,7 @@ wss.on('connection', function connection(ws) {
                     } else if(message.tag == 'upload_task_result') {
 
                         message.data.clientId = clientId;
+                        message.data.connectionId = clientId;
                         var options = {
                             uri: config.storageUrl + '/api/v1/task/' + message.data.taskId + '/result/',
                             method: 'POST',

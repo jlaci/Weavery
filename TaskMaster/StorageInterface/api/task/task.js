@@ -51,8 +51,13 @@ app.get('/:taskId/result/:index', function (req, res) {
 
 app.post('/:taskId/result/', function (req, res) {
     new TaskResult(req.body).save(function (err) {
-        console.log(err);
-        res.statusCode = 500;
-        res.end();
+        if(err) {
+            console.log(err);
+            res.statusCode = 500;
+            res.end();
+        } else {
+            res.statusCode = 200;
+            res.end();
+        }
     });
 });

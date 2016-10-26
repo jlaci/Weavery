@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html>
+<head><title>Javascript RT</title></head>
+
+<body>
+<script type="text/javascript">
+/* Javascript minimal ray tracing engine
+ * Copyright (C) 2012 Salvatore Sanfilippo <antirez@gmail.com>
+ *
+ * This softare is released under the terms of the BSD two-clause license. */
+
+function calculate(index, data) {
+
+	function write(buffer, offs) {
+		for (var i = 2; i < arguments.length; i++) {
+			for (var j = 0; j < arguments[i].length; j++) {
+				buffer[offs++] = arguments[i].charAt(j);
+			}
+		}
+	}
+
+	function byte2(w) {
+		return String.fromCharCode((w >> 8) & 255, w & 255);
+	}
+
+	function byte4(w) {
+		return String.fromCharCode((w >> 24) & 255, (w >> 16) & 255, (w >> 8) & 255, w & 255);
+	}
+
+	function byte2lsb(w) {
+		return String.fromCharCode(w & 255, (w >> 8) & 255);
+	}
+
+	var PNGlib = function(width,height,depth) {
+
+		this.width   = width;
+		this.height  = height;
+		this.depth   = depth;
+
+		// pixel data and row filter identifier size
+		this.pix_size = height * (width + 1);
+
+		// deflate header, pix_size, block headers, adler32 checksum
+		this.data_size = 2 + this.pix_size + 5 * Math.floor((0xfffe + this.pix_size) / 0xffff) + 4;
+
+		// offsets and sizes of Png chunks
+		this.ihdr_offs = 0;									// IHDR offset and size
+		this.ihdr_size = 4 + 4 + 13 + 4;
+		this.plte_offs = this.ihdr_offs + this.ihdr_size;	// PLTE offset and size
+		this.plte_size = 4 + 4 + 3 * depth + 4;
+		this.trns_offs = this.plte_offs + this.plte_size;	// tRNS offset and size
+		this.trns_size = 4 + 4 + depth + 4;
+		this.idat_offs = this.trns_offs + this.trns_size;	// IDAT offset and size
+		this.idat_size = 4 + 4 + this.data_size + 4;
+		this.iend_offs = this.idat_offs + this.idat_size;	// IEND offset and size
+		this.iend_size = 4 + 4 + 4;
+		this.buffer_size  = this.iend_offs + this.iend_size;	// total PNG size
+
+		this.buffer  = new Array();
+		this.palette = new Object();
+		this.pindex  = 0;
+
+		var _crc32 = new Array();
+
+		// initialize buffer with zero bytes
+		for (var i = 0; i < this.buffer_size; i++) {
+			this.buffer[i] = "\x00";
+		}
+
+		// initialize non-zero elements
+		write(this.buffer, this.ihdr_offs, byte4(this.ihdr_size - 12), 'IHDR', byte4(width), byte4(height), "\x08\x03");
+		write(this.buffer, this.plte_offs, byte4(this.plte_size - 12), 'PLTE');
+		write(this.buffer, this.trns_offs, byte4(this.trns_size - 12), 'tRNS');
+		write(this.buffer, this.idat_offs, byte4(this.idat_size - 12), 'IDAT');
+		write(this.buffer, this.iend_offs, byte4(this.iend_size - 12), 'IEND');
+
+		// initialize deflate header
+		var header = ((8 + (7 << 4)) << 8) | (3 << 6);
+		header+= 31 - (header % 31);
+
+		write(this.buffer, this.idat_offs + 8, byte2(header));
+
+		// initialize deflate block headers
+		for (var i = 0; (i << 16) - 1 < this.pix_size; i++) {
+			var size, bits;
+			if (i + 0xffff < this.pix_size) {
+				size = 0xffff;
+				bits = "\x00";
+			} else {
+				size = this.pix_size - (i << 16) - i;
+				bits = "\x01";
+			}
+			write(this.buffer, this.idat_offs + 8 + 2 + (i << 16) + (i << 2), bits, byte2lsb(size), byte2lsb(~size));
+		}
+
+		/* Create crc32 lookup table */
+		for (var i = 0; i < 256; i++) {
+			var c = i;
+			for (var j = 0; j < 8; j++) {
+				if (c & 1) {
+					c = -306674912 ^ ((c >> 1) & 0x7fffffff);
+				} else {
+					c = (c >> 1) & 0x7fffffff;
+				}
+			}
+			_crc32[i] = c;
+		}
+
+		// compute the index into a png for a given pixel
+		this.index = function(x,y) {
+			var i = y * (this.width + 1) + x + 1;
+			var j = this.idat_offs + 8 + 2 + 5 * Math.floor((i / 0xffff) + 1) + i;
+			return j;
+		}
+
+		// convert a color and build up the palette
+		this.color = function(red, green, blue, alpha) {
+
+			alpha = alpha >= 0 ? alpha : 255;
+			var color = (((((alpha << 8) | red) << 8) | green) << 8) | blue;
+
+			if (typeof this.palette[color] == "undefined") {
+				if (this.pindex == this.depth) return "\x00";
+
+				var ndx = this.plte_offs + 8 + 3 * this.pindex;
+
+				this.buffer[ndx + 0] = String.fromCharCode(red);
+				this.buffer[ndx + 1] = String.fromCharCode(green);
+				this.buffer[ndx + 2] = String.fromCharCode(blue);
+				this.buffer[this.trns_offs+8+this.pindex] = String.fromCharCode(alpha);
+
+				this.palette[color] = String.fromCharCode(this.pindex++);
+			}
+			return this.palette[color];
+		}
+
+		// output a PNG string, Base64 encoded
+		this.getBase64 = function() {
+
+			var s = this.getDump();
+
+			// If the current browser supports the Base64 encoding
+			// function, then offload the that to the browser as it
+			// will be done in native code.
+			if ((typeof window.btoa !== 'undefined') && (window.btoa !== null)) {
+				return window.btoa(s);
+			}
+
+			var ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+			var c1, c2, c3, e1, e2, e3, e4;
+			var l = s.length;
+			var i = 0;
+			var r = "";
+
+			do {
+				c1 = s.charCodeAt(i);
+				e1 = c1 >> 2;
+				c2 = s.charCodeAt(i+1);
+				e2 = ((c1 & 3) << 4) | (c2 >> 4);
+				c3 = s.charCodeAt(i+2);
+				if (l < i+2) { e3 = 64; } else { e3 = ((c2 & 0xf) << 2) | (c3 >> 6); }
+				if (l < i+3) { e4 = 64; } else { e4 = c3 & 0x3f; }
+				r+= ch.charAt(e1) + ch.charAt(e2) + ch.charAt(e3) + ch.charAt(e4);
+			} while ((i+= 3) < l);
+			return r;
+		}
+
+		// output a PNG string
+		this.getDump = function() {
+
+			// compute adler32 of output pixels + row filter bytes
+			var BASE = 65521; /* largest prime smaller than 65536 */
+			var NMAX = 5552;  /* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1 */
+			var s1 = 1;
+			var s2 = 0;
+			var n = NMAX;
+
+			for (var y = 0; y < this.height; y++) {
+				for (var x = -1; x < this.width; x++) {
+					s1+= this.buffer[this.index(x, y)].charCodeAt(0);
+					s2+= s1;
+					if ((n-= 1) == 0) {
+						s1%= BASE;
+						s2%= BASE;
+						n = NMAX;
+					}
+				}
+			}
+			s1%= BASE;
+			s2%= BASE;
+			write(this.buffer, this.idat_offs + this.idat_size - 8, byte4((s2 << 16) | s1));
+
+			// compute crc32 of the PNG chunks
+			function crc32(png, offs, size) {
+				var crc = -1;
+				for (var i = 4; i < size-4; i += 1) {
+					crc = _crc32[(crc ^ png[offs+i].charCodeAt(0)) & 0xff] ^ ((crc >> 8) & 0x00ffffff);
+				}
+				write(png, offs+size-4, byte4(crc ^ -1));
+			}
+
+			crc32(this.buffer, this.ihdr_offs, this.ihdr_size);
+			crc32(this.buffer, this.plte_offs, this.plte_size);
+			crc32(this.buffer, this.trns_offs, this.trns_size);
+			crc32(this.buffer, this.idat_offs, this.idat_size);
+			crc32(this.buffer, this.iend_offs, this.iend_size);
+
+			// convert PNG to string
+			return "\211PNG\r\n\032\n"+this.buffer.join('');
+		}
+	}
+
+
+  var pixels;
+  var screen_width = data.width;
+  var screen_height = data.height;
+  var chunks = data.chunks;
+
+  function draw() {
+      var division = Math.sqrt(chunks);
+
+      var tile_x = (screen_width / division);
+      var tile_y = (screen_height / division);
+      pixels = new PNGlib(tile_x, tile_y, 256);
+
+      computeScene();
+
+      return pixels.getBase64();
+  };
+
+  function computeScene() {
+      var scene = new Scene();
+
+      var sphere1 = scene.addObject(new Obj("Sphere 1",new Sphere()));
+      var sphere2 = scene.addObject(new Obj("Sphere 2",new Sphere()));
+      var plane = scene.addObject(new Obj("Ground",new Plane(0,.5,-2,0,.5,-4,2,.5,-2)));
+      var light1 = scene.addLight(new Obj("Light 1",new Light()));
+      var light2 = scene.addLight(new Obj("Light 2",new Light()));
+      var light3 = scene.addLight(new Obj("Light 3",new Light()));
+
+      sphere1.o.center.x = 1;
+      sphere1.o.radius = 0.5;
+
+      sphere2.o.center.x = -1;
+      sphere2.o.radius = 0.5;
+
+      light1.o.center.set(4,-1,-2);
+      light2.o.center.set(-1,-1,-2);
+      light3.o.center.set(1,-6,-2);
+
+      light1.color.r = .5;
+      light1.color.g = .5;
+      light1.color.b = .5;
+
+      light2.color.r = .3;
+      light2.color.g = .3;
+      light2.color.b = .3;
+
+      light3.color.r = .4;
+      light3.color.g = .4;
+      light3.color.b = .4;
+
+      sphere1.color.r = 1;
+      sphere1.color.g = .3;
+      sphere1.color.b = .3;
+      sphere1.specularity = .5;
+      sphere1.reflection = .1;
+
+      sphere2.color.r = .3;
+      sphere2.color.g = 1;
+      sphere2.color.b = .3;
+      sphere2.specularity = .5;
+      sphere2.reflection = .1;
+
+      plane.color.r = .3;
+      plane.color.g = .3;
+      plane.color.b = .3;
+
+      scene.traceScene();
+  }
+
+  // Vector implementation
+
+  function Vector(x,y,z) {
+      if (arguments.length == 0) {
+          x = y = z = 0;
+      }
+      this.x = x;
+      this.y = y;
+      this.z = z;
+  }
+
+  Vector.prototype = {
+      // Set x, y, z
+      set: function(x,y,z) {
+          this.x = x;
+          this.y = y;
+          this.z = z;
+      },
+
+      // Vector magnitude
+      magnitude: function() {
+          return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
+      },
+
+      // Vector normalization (modify the vector so that that it has
+      // magnitude 1 but with the same orientation as the original vector).
+      normalize: function() {
+          var m = this.magnitude();
+
+          if (m == 0) m = 1;
+          this.x /= m;
+          this.y /= m;
+          this.z /= m;
+          return this;
+      }
+  }
+
+  // Ray implementation
+
+  function Ray() {
+      this.origin = new Vector();
+      this.direction = new Vector();
+  }
+
+  // Sphere implementation
+
+  function Sphere() {
+      this.type = "sphere";
+      this.center = new Vector();
+      this.radius = 1.0;
+  }
+
+  Sphere.prototype = {
+      /* Normal on a point of the sphere, normalized.
+         We don't use the Vector object for speed issues. */
+      normalToPoint: function(x,y,z) {
+          x -= this.center.x;
+          y -= this.center.y;
+          z -= this.center.z;
+          /* we already know the magnitudo that is just the radius of the sphere
+             so we can easily normalize the vector just dividing for it. */
+          x /= this.radius;
+          y /= this.radius;
+          z /= this.radius;
+          return {x: x, y: y, z: z};
+      },
+
+      /* Intersect a ray with this sphere. Returns an object
+         with two fields: 'type' and 'dist'.
+
+         Type can be:
+
+         0: no intersection
+         1: internal intersection (the ray origin is inside the sphere)
+         2: external intersection (the ray origin is outside the sphere)
+
+         The distance is simply the distance between the ray origin and
+         the intersection point.
+
+         NOTE: This function needs ray.direction to be normalized. */
+      intersect: function(ray) {
+          var x, y, z, distance = +Infinity;
+
+          /* set x,y,z to the sphere center minus the ray origin. */
+          x = this.center.x - ray.origin.x;
+          y = this.center.y - ray.origin.y;
+          z = this.center.z - ray.origin.z;
+          /* compute x,y,z dot product with itself. */
+          var xyz_dot = (x*x)+(y*y)+(z*z);
+          /* compute dot product between x,y,z and ray direction. */
+          var b = (x*ray.direction.x)+(y*ray.direction.y)+(z*ray.direction.z);
+
+          /* We can now compute the discriminant and check for intersections. */
+          var disc = b*b - xyz_dot + this.radius*this.radius;
+          var type = 0;
+
+          if (disc > 0) {
+              var d = Math.sqrt(disc);
+              var root1 = b-d;
+              var root2 = b+d;
+
+              if (root2 > 0) {
+                  if (root1 < 0) {
+                      if (root2 < distance) { distance = root2; type = -1; }
+                  } else {
+                      if (root1 < distance) { distance = root1; type = 1; }
+                  }
+              }
+          }
+          return {type: type, dist: distance};
+      }
+  }
+
+  // Plane
+
+  function Plane(x1,y1,z1,x2,y2,z2,x3,y3,z3) {
+      /* Create a plane passing from the three points. We take as input
+         the three points but internally represent the plane as the normal
+         to the plane and a point, in the form:
+
+         ax + by + cz + d = 0
+
+         Note: a,b,c is the vector representing the normal. We need to compute
+         a,b,c and d.
+
+         To compute the normal vector a,b,c we use the fact that given three
+         points we can compute v1 and v2, two vectors that are parallel to the
+         plan. */
+      var v1x = x1-x2, v1y = y1-y2, v1z = z1-z2;
+      var v2x = x1-x3, v2y = y1-y3, v2z = z1-z3;
+
+      /* Now the vectorial product between v1 and v2 is a vector that
+         is normal to the plane. */
+      var nx = (v1y*v2z)-(v1z*v2y);
+      var ny = (v1z*v2x)-(v1x*v2z);
+      var nz = (v1x*v2y)-(v1y*v2x);
+
+      /* We are still missing d, but since we know that x1,y1,z1 is a point
+         on the plane, we know that:
+
+         ax1 + by1 + cz1 + d = 0
+
+         so
+
+         d = -(ax1 + by1 + cz1)
+      */
+      this.normal = new Vector(nx,ny,nz);
+      this.d = -(nx*x1 + ny*y1 + nz*z1);
+  }
+
+  Plane.prototype = {
+      normalToPoint: function(x,y,z) {
+          return this.normal;
+      },
+
+      intersect: function(ray) {
+          var type = 0;
+          var distance = +Infinity;
+
+          /* First check if there is an intersection between the ray and the
+             plane. If the ray is parallel to the plane there is not for sure.
+
+             Compute the dot product between the ray direction and the plan
+             normal (that is, the cosine of the angle between the two vectors).
+             If it is zero we can not have a collision. */
+          var ndotrd = (this.normal.x * ray.direction.x) +
+                       (this.normal.y * ray.direction.y) +
+                       (this.normal.z * ray.direction.z);
+          if (ndotrd) {
+              /* Compute the intersection distance. */
+              var ndoro = (this.normal.x * ray.origin.x) +
+                          (this.normal.y * ray.origin.y) +
+                          (this.normal.z * ray.origin.z);
+              distance = - (ndoro + this.d)/ndotrd;
+              /* Now there is an intersection only if the distance is positive,
+                 otherwise the intersection is not in the ray direction
+                 (but is backward). */
+              if (distance > 0) type = 1;
+          }
+          return {type: type, dist: distance};
+      }
+  }
+
+  // Light
+
+  function Light() {
+      this.type = "light";
+      this.center = new Vector();
+  }
+
+  // Generic scene object implementation
+
+  function Obj(name,o) {
+      this.name = name;
+      this.o = o;
+      this.color = {r: 1, g: 1, b: 1};
+      this.specularity = 0;
+      this.reflection = 0;
+  }
+
+  // Scene object
+
+  function Scene() {
+      this.objects = [];
+      this.lights = [];
+  }
+
+  Scene.prototype = {
+      addObject: function(o) {
+          this.objects.push(o);
+          return o;
+      },
+
+      addLight: function(o) {
+          this.lights.push(o);
+          return o;
+      },
+
+      traceRay: function (ray, depth) {
+          var obj = null;
+          var color = {r: 0, g: 0, b: 0};
+          var distance = +Infinity;
+
+          for (var j = 0; j < this.objects.length; j++) {
+              var test_obj = this.objects[j];
+              var res = test_obj.o.intersect(ray);
+              if (res.type) {
+                  if (obj == null || res.dist < distance) {
+                      obj = test_obj;
+                      distance = res.dist;
+                  }
+              }
+          }
+
+          /* Determine the color if we hit sometihng */
+          if (obj) {
+              /* We have the distance, so we can compute the intersection
+                 point simply as: origin + (direction * distance) */
+              var x = ray.origin.x + ray.direction.x*distance,
+                  y = ray.origin.y + ray.direction.y*distance,
+                  z = ray.origin.z + ray.direction.z*distance;
+              /* Now get the normal to the intersection point of the object */
+              var normal = obj.o.normalToPoint(x,y,z);
+
+              for (var j = 0; j < this.lights.length; j++) {
+                  var light = this.lights[j];
+
+                  /* COMPUTE RAY INTERSECTION POINT.
+                     Compute the vector that looks from the intersection
+                     point to the light. We do this simply subtracting the
+                     intersection point from the light position. */
+                  var lx = light.o.center.x - x;
+                  var ly = light.o.center.y - y;
+                  var lz = light.o.center.z - z;
+                  /* Normalize */
+                  var len = Math.sqrt(lx*lx + ly*ly + lz*lz);
+                  if (len == 0) len = 1;
+                  lx /= len;
+                  ly /= len;
+                  lz /= len;
+
+                  /* HANDLE SHADOWS.
+                     Is this light obscured by some other object?
+                     We simply trace a ray between the ray-object intersection
+                     point (x,y,z variables) and the light center.
+
+                     If this ray intersects some object with a distance smaller
+                     than the light itself, this point is in shadow from the
+                     point of view of this light. */
+                  /* Compute the distance between the point and the light. */
+                  var pldistance = Math.sqrt(
+                      (x-light.o.center.x)*(x-light.o.center.x)+
+                      (y-light.o.center.y)*(y-light.o.center.y)+
+                      (z-light.o.center.z)*(z-light.o.center.z));
+                  var sray = new Ray();
+                  sray.origin.set(x,y,z);
+                  /* We need to add a small number towards the light to the
+                     origin vector, to make sure it will not intersect with the
+                     current object itself. */
+                  sray.origin.x += lx/1000;
+                  sray.origin.y += ly/1000;
+                  sray.origin.z += lz/1000;
+                  /* To set the direction  we can use lx, ly, lz variables that
+                     are already set to a normalized vector pointing from the
+                     intersection point to the light. */
+                  sray.direction.set(lx, ly, lz);
+                  var shadow = false;
+                  for (var i = 0; i < this.objects.length; i++) {
+                      var test_obj = this.objects[i];
+                      var res = test_obj.o.intersect(sray);
+                      if (res.type && res.dist < pldistance) {
+                          shadow = true;
+                          break;
+                      }
+                  }
+                  if (shadow) continue; /* try next light */
+
+                  /* DIFFUSE SHADING.
+                     Now the dot product between the normal and the point
+                     towards the light is the cosine between the angle
+                     formed by the vectors, that is, our brightness. */
+                  var cosine = normal.x*lx+normal.y*ly+normal.z*lz;
+                  if (cosine < 0) cosine = 0;
+                  color.r += cosine * obj.color.r * light.color.r;
+                  color.g += cosine * obj.color.g * light.color.g;
+                  color.b += cosine * obj.color.b * light.color.b;
+
+                  /* SPECULAR SHADING.
+                     Add point of view dependent specular light using
+                     Phone shading. */
+                  if (obj.specularity > 0) {
+                      var vrx = lx - normal.x * cosine * 2,
+                          vry = ly - normal.y * cosine * 2,
+                          vrz = lz - normal.z * cosine * 2;
+                      var cosSigma = (ray.direction.x*vrx)+
+                                     (ray.direction.y*vry)+
+                                     (ray.direction.z*vrz);
+                      if (cosSigma > 0) {
+                          var specularity = obj.specularity;
+                          color.r += light.color.r * specularity * Math.pow(cosSigma,64);
+                          color.g += light.color.g * specularity * Math.pow(cosSigma,64);
+                          color.b += light.color.b * specularity * Math.pow(cosSigma,64);
+                      }
+                  }
+
+                  /* REFLECTION.
+                     This is easy, we compute the reflection ray, that
+                     is given by:
+
+                     Rr = R - 2* N * (R dot N)
+
+                     Where R is the ray that we want reflected.
+                           N is the normal of the surface.
+
+                     Having the ray we simply call this function recursively
+                     to check the color of the object hit by this reflected
+                     ray. */
+                  if (obj.reflection > 0 && depth < 5) {
+                      var rr = new Ray();
+                      var dotnr = (ray.direction.x * normal.x) +
+                                  (ray.direction.y * normal.y) +
+                                  (ray.direction.z * normal.z);
+                      rr.origin.set(x,y,z);
+                      rr.direction.set(ray.direction.x - 2 * normal.x * dotnr,
+                                       ray.direction.y - 2 * normal.y * dotnr,
+                                       ray.direction.z - 2 * normal.z * dotnr);
+                      rr.origin.x += rr.direction.x / 1000;
+                      rr.origin.y += rr.direction.y / 1000;
+                      rr.origin.z += rr.direction.z / 1000;
+                      var rcolor = this.traceRay(rr,depth+1);
+                      color.r *= 1-obj.reflection;
+                      color.g *= 1-obj.reflection;
+                      color.b *= 1-obj.reflection;
+                      color.r += rcolor.color.r * obj.reflection;
+                      color.g += rcolor.color.g * obj.reflection;
+                      color.b += rcolor.color.b * obj.reflection;
+                  }
+              }
+              if (color.r > 1) color.r = 1;
+              if (color.g > 1) color.g = 1;
+              if (color.b > 1) color.b = 1;
+          }
+          return {obj: obj, color: color}
+      },
+
+      traceScene: function () {
+          var pov = new Vector(0,0,-4);
+          var ray = new Ray();
+
+          ray.origin = pov
+
+          var division = Math.sqrt(chunks);
+
+          var tile_x = (screen_width / division);
+          var start_x = index % division * tile_x;
+          var end_x = (index % division + 1) * tile_x;
+
+          var tile_y = (screen_height / division);
+          var start_y = Math.floor(index / division) * tile_y;
+          var end_y = (Math.floor(index / division) + 1) * tile_y;
+
+          var pic_x = 0;
+
+          for (var x = start_x; x < end_x; x++) {
+              var pic_y = 0;
+              for (var y = start_y; y < end_y; y++) {
+                  ray.direction.set((x-screen_width/2)/100,
+                                    (y-screen_height/2)/100,
+                                    4);
+                  ray.direction.normalize();
+                  var trace = this.traceRay(ray,0);
+
+                  var multiplier = 255;
+                  var gammaCorrection = 0.9;
+
+
+                  var red = Math.min(255, Math.pow(255 * (trace.color.r), gammaCorrection));
+                  if(red > 255 || red < 0) {
+                    //alert('red szar' + red);
+                  }
+
+
+                  var green =  Math.min(255, Math.pow(255 * (trace.color.g), gammaCorrection));
+                  if(green > 255 || green < 0) {
+                    //alert('green szar' + green);
+                  }
+
+                  var blue =  Math.min(255, Math.pow(255 * (trace.color.b), gammaCorrection));
+                  if(blue > 255 || blue < 0) {
+                    //alert('blue szar' + blue);
+                  }
+
+                  var color = pixels.color(red, green, blue);
+                  pixels.buffer[pixels.index(pic_x, pic_y)] = color;
+                  /*pixels.buffer[offset+3] = 255;
+                  pixels.buffer[offset+0] = trace.color.r*255;
+                  pixels.buffer[offset+1] = trace.color.g*255;
+                  pixels.buffer[offset+2] = trace.color.b*255;*/
+                  pic_y++;
+              }
+              pic_x++;
+          }
+      }
+  }
+
+  return draw();
+}
+
+for(var i = 0; i < 8; i++) {
+  for(var j = 0; j < 8; j++) {
+    var img = calculate(i * 8 + j, {width: 1024, height: 768, chunks: 64});
+    document.write('<img src="data:image/png;base64,'+img+'">');
+  }
+  document.write('<br />')
+}
+
+</script>
+</body>
+</html>
