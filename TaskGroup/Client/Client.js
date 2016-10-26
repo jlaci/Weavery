@@ -6,7 +6,7 @@ var CentralizedClient = require('./js/Centralized.js');
 var centralizedLocation = 'ws://localhost:8003/client';
 
 var WeaveryClient = function() {
-   if(webrtcSupport.support && webrtcSupport.supportDataChannel && webrtcSupport.PeerConnection) {
+   if(false && webrtcSupport.support && webrtcSupport.supportDataChannel && webrtcSupport.PeerConnection) {
        console.log("Running in WebRTC capable browser, starting distributed client.");
        this.clientImpl = new DistributedClient();
    } else {
@@ -21,10 +21,10 @@ WeaveryClient.prototype = {
     workingMode: 'Centralized',
 
     executeTaskPart: function(task, index, count, data, cb) {
-        console.time("task: " + task.taskId + " taskPart: " + index);
+        console.time(this.clientImpl.id + " task: " + task.taskId + " taskPart: " + index);
         var program = new Function(['index', 'data'], task.program);
         var result = program(index, data);
-        console.timeEnd("task: " + task.taskId + " taskPart: " + index);
+        console.timeEnd(this.clientImpl.id + "task: " + task.taskId + " taskPart: " + index);
 
         this.clientImpl.uploadTaskPartResult(task.taskId, index, result, function () {
             cb(task, (index + 1) % task.size, count + 1);

@@ -35,8 +35,9 @@ CentralizedClient.prototype = {
                     var message = JSON.parse(rawMessage.data);
                     message.data = JSON.parse(message.data);
 
-                    if(message.tag = '')
-                    if(message.tag == 'tasks_result') {
+                    if(message.tag == 'client_join') {
+                        self.id = message.data.clientId;
+                    } else if(message.tag == 'tasks_result') {
                         self.emitter.emit('tasks_result', message.data);
                     } else if(message.tag == 'task_program_result') {
                         self.emitter.emit('task_program_result', message.data);

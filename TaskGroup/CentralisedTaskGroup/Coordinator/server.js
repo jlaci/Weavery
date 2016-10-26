@@ -33,12 +33,14 @@ wss.on('connection', function connection(ws) {
         }
     }
 
-    var clientId = uuid.v4();   //TODO: send to client for storage
     var location = url.parse(ws.upgradeReq.url, true);
-    console.log("WS connection to: " + location.path + " assigning ClientID" + clientId);
-    sendResponse('client_join')(clientId);
 
     if(location.path == '/client') {
+        var clientId = uuid.v4();   //TODO: send to client for storage
+
+        console.log("WS connection to: " + location.path + " assigning ClientID" + clientId);
+        sendResponse('client_join')(JSON.stringify({clientId: clientId}));
+
         ws.on('message', function incoming(rawMessage) {
             //console.log('received: %s', rawMessage);
             var message;
