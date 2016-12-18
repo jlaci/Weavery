@@ -5,6 +5,7 @@ var DistributedClient = function(){
 
 DistributedClient.prototype = {
     dht: null,
+    nick: '',
     startNode : function () {
         var kademlia = require('kad');
         var WebRTC = require('kad-webrtc');
@@ -21,6 +22,7 @@ DistributedClient.prototype = {
             return v.toString(16);
         });
         var signalClient = new SignalClient(nodeNick);
+        this.nick = nodeNick;
 
 
         //Join the DHT
@@ -43,14 +45,16 @@ DistributedClient.prototype = {
                     document.getElementById("status").innerHTML = 'Failed' + err;
                 } else {
                     document.getElementById("status").innerHTML = 'Connected';
-                    self.fetchJobs();
                 }
             });
         });
     },
 
     uploadTaskPartResult: function(taskId, index, data, cb) {
-        this.dht.put(taskId + '_result_' + index, data, function (err) {
+        var self = this;
+        console.time(taskId + "_" + index + "_upload_" + self.nick);
+        this.dht.put(taskId + '_result_' + index + '_' + self.nick, data, function (err) {
+            console.timeEnd(taskId + "_" + index + "_upload_" + self.nick);
             if(err) {
                 console.log(err);
             } else {
@@ -70,11 +74,15 @@ DistributedClient.prototype = {
     },
 
     getTaskDataPart: function(taskId, index, cb) {
+        var self = this;
+        console.time(taskId + "_" + index + "_datafetch_" + self.nick);
+
         this.dht.get(taskId + '_datapart_' + index, function (err, data) {
+            console.timeEnd(taskId + "_" + index + "_datafetch_" + self.nick);
             if(err) {
                 console.log(err);
             } else {
-               cb(data.data);
+               cb(data);
             }
         });
     },
@@ -83,10 +91,10 @@ DistributedClient.prototype = {
         this.dht.get('tasks', function(err, value) {
             if (value === undefined) {
                 cb([]);
-                console.tasks("No task found!");
+                console.log("No task found!");
             } else {
                 cb(value);
-                console.tasks("Found " + value.length + " jobs");
+                console.log("Found " + value.length + " jobs");
             }
         });
     }

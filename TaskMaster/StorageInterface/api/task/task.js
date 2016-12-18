@@ -50,14 +50,20 @@ app.get('/:taskId/result/:index', function (req, res) {
 });
 
 app.post('/:taskId/result/', function (req, res) {
-    new TaskResult(req.body).save(function (err) {
+    console.time();
+
+    var result = new TaskResult(req.body);
+    console.time(result.taskId + "_" + result.index + "_" + result.clientId);
+    result.save(function (err) {
         if(err) {
             console.log(err);
             res.statusCode = 500;
             res.end();
+            console.timeEnd(result.taskId + "_" + result.index + "_" + result.clientId);
         } else {
             res.statusCode = 200;
             res.end();
+            console.timeEnd(result.taskId + "_" + result.index + "_" + result.clientId);
         }
     });
 });

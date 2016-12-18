@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+    <head>
+        <script src="dist/Client.browser.js"></script>
+    </head>
+    <body>
+        <h1>WebSeed sink node</h1>
+
+        <button onclick="taskManager.getAllResults()">Get results</button>
+
+        <div id="log">
+        </div>
+        <script>
+        window.console = {
+          log: function(str){
+            var node = document.createElement("div");
+            node.appendChild(document.createTextNode(str));
+            document.getElementById("log").appendChild(node);
+          }
+        }
+        </script>
+    </body>
+</html>

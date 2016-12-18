@@ -15,7 +15,7 @@ function SignalClient(nick) {
   var signalClient = this;
 
   webSocket.on('open', function() {
-    console.log('WebSocket to SignalServer open, announcing ClientNode join with nick ' + nick);
+    //console.log('WebSocket to SignalServer open, announcing ClientNode join with nick ' + nick);
     webSocket.send(JSON.stringify({ announceNick: nick }));
   });
 
