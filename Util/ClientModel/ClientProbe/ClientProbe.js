@@ -80,8 +80,8 @@ ClientProbe.prototype = {
 
   getNewSessionData: function () {
     return {
-      startTime: new Date().getMilliseconds(),
-      endTime: new Date().getMilliseconds(),
+      startTime: new Date().getTime(),
+      endTime: new Date().getTime(),
       steps: 0
     }
   },
@@ -93,7 +93,7 @@ ClientProbe.prototype = {
     if (!self.benchmarkData) {
       console.log('BenchmarkData not found in localStorage, starting anew.');
       self.benchmarkData = {
-        nextSessionIndex: 0,
+        nextSessionIndex: 1,
         sessionData: [
           self.getNewSessionData()
         ]
@@ -116,7 +116,7 @@ ClientProbe.prototype = {
     console.log('Tick.');
     var index = clientProbe.benchmarkData.nextSessionIndex - 1;
     clientProbe.benchmarkData.sessionData[index].steps++;
-    clientProbe.benchmarkData.sessionData[index].endTime = new Date().getMilliseconds();
+    clientProbe.benchmarkData.sessionData[index].endTime = new Date().getTime();
 
     setTimeout(function() {clientProbe.benchmarkTick(clientProbe)}, clientProbe.timeStep);
   },
@@ -126,7 +126,7 @@ ClientProbe.prototype = {
     self.saveBenchmarkData();
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent('{"clientInfo": ' + localStorage.getItem('clientInfo') + ', "benchmarkData":' + localStorage.getItem('benchmarkData') + '}');
     var dlAnchorElem = document.getElementById('downloadAnchorElem');
-    dlAnchorElem.setAttribute("href",     dataStr     );
+    dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute("download", "measurements.json");
     dlAnchorElem.click();
   }

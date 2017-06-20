@@ -1,0 +1,42 @@
+{
+  "benchmarkData": {
+    "nextSessionIndex": 4, 
+    "sessionData": [
+      {
+        "endTime": 1497953643095, 
+        "startTime": 1497953630019, 
+        "steps": 27
+      }, 
+      {
+        "endTime": 1497953653347, 
+        "startTime": 1497953648322, 
+        "steps": 11
+      }, 
+      {
+        "endTime": 1497953657444, 
+        "startTime": 1497953653431, 
+        "steps": 9
+      }, 
+      {
+        "endTime": 1497953701956, 
+        "startTime": 1497953682440, 
+        "steps": 24
+      }
+    ]
+  }, 
+  "clientInfo": {
+    "browser": {
+      "name": "Chrome", 
+      "version": "58.0.3029.110"
+    }, 
+    "fingerprint": 763600270, 
+    "os": {
+      "name": "Mac OS", 
+      "version": "10.12.3"
+    }, 
+    "webGL": {
+      "renderer": "AMD Radeon Barts PRO Prototype OpenGL Engine", 
+      "vendor": "ATI Technologies Inc."
+    }
+  }
+}
