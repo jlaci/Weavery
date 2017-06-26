@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var config = require('./config');
 var mongoose = require('mongoose');
 var letsEncrypt = config.letsEncrpyt || false;
+var httpsEnabled = config.https || false;
 
 
 mongoose.connect(config.mongoUri);
@@ -67,6 +68,18 @@ if(letsEncrypt) {
   });
 
   console.log('Analytics collector started!');
+} else if(httpsEnabled) {
+  var fs = require('fs');
+  var https = require('https');
+
+  var options = {
+    key: fs.readFileSync('keys/server.key'),
+    cert: fs.readFileSync('keys/server.crt'),
+    ca: fs.readFileSync('keys/server.ca')
+  };
+
+  var httpsServer = https.createServer(options, app);
+  httpsServer.listen(8443);
 } else {
   app.listen(config.port);
   console.log('Analytics collector started on ' + config.port + ' port!');
