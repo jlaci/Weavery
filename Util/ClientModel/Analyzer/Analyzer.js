@@ -7,6 +7,7 @@ fs.readFile('./measurements.json', 'utf8', function (err, data) {
   }
   var measurement = JSON.parse(data);
   var timeStep = 500;
+  var treshold = 10;
 
   var aggregate = {
     startTime: -1,

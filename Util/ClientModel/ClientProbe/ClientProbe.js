@@ -1,6 +1,7 @@
-var ClientProbe = function(url){
-  this.url = url;
+var ClientProbe = function(){
   this.timeStep = 500;
+  this.maxSteps = 1200;
+  this.step = 0;
   this.startClient();
 };
 
@@ -10,38 +11,19 @@ ClientProbe.prototype = {
     console.log('Starting client probe');
     var self = this;
 
-    // Client info should not change
-    var clientInfo = self.loadClientInfo();
-    if (!clientInfo) {
-      console.log('ClientInfo not found in localStorage, gathering...');
-      clientInfo = self.gatherClientInfo();
+    var stored = localStorage.getItem('savedClientProbeData');
+    if(stored) {
+      var parsed = JSON.parse(stored);
+      self.benchmarkData = parsed.benchmarkData;
+      self.clientInfo = parsed.clientInfo;
+      console.log('Found previously un-uploaded data, uploading');
+      self.uploadResult();
     }
 
-    self.clientInfo = clientInfo;
-    self.saveClientInfo(clientInfo);
+    self.clientInfo = self.gatherClientInfo();
 
     // Start/resume the benchmark if we have
     self.startBenchmark()
-  },
-
-  /**
-   * Loads the stored client information from the local storage
-   */
-  loadClientInfo: function () {
-    console.log('Loading clientInfo from localStorage');
-    var stored = localStorage.getItem('clientInfo');
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  },
-
-  /**
-   * Save the given client info into the local storage
-   * @param clientInfo
-   */
-  saveClientInfo: function (clientInfo) {
-    console.log('Saving clientInfo to localStorage');
-    localStorage.setItem('clientInfo', JSON.stringify(clientInfo));
   },
 
   /**
@@ -65,66 +47,74 @@ ClientProbe.prototype = {
     };
   },
 
-  loadBenchmarkData: function () {
-    console.log('Loading benchmarkData from localStorage');
-    var stored = localStorage.getItem('benchmarkData');
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  },
-
-  saveBenchmarkData: function () {
-    var self = this;
-    localStorage.setItem('benchmarkData', JSON.stringify(self.benchmarkData));
-  },
-
-  getNewSessionData: function () {
-    return {
-      startTime: new Date().getTime(),
-      endTime: new Date().getTime(),
-      steps: 0
-    }
-  },
-
   startBenchmark: function () {
     var self = this;
 
-    self.benchmarkData = self.loadBenchmarkData();
-    if (!self.benchmarkData) {
-      console.log('BenchmarkData not found in localStorage, starting anew.');
-      self.benchmarkData = {
-        nextSessionIndex: 1,
-        sessionData: [
-          self.getNewSessionData()
-        ]
-      };
-    } else {
-      console.log('Stored BenchmarkData was found, resuming.');
-      self.benchmarkData.nextSessionIndex++;
-      self.benchmarkData.sessionData.push(self.getNewSessionData());
-    }
+    self.benchmarkData = {
+      location: window.location.href,
+      sessionData: [
+
+      ]
+    };
 
     // Add a listener to save the benchmark data before leaving the site
     window.onbeforeunload = function() {
-      self.saveBenchmarkData();
+      self.uploadResult();
     };
 
     self.benchmarkTick(self);
   },
 
   benchmarkTick: function(clientProbe) {
-    console.log('Tick.');
-    var index = clientProbe.benchmarkData.nextSessionIndex - 1;
-    clientProbe.benchmarkData.sessionData[index].steps++;
-    clientProbe.benchmarkData.sessionData[index].endTime = new Date().getTime();
+    if(clientProbe.step < clientProbe.maxSteps) {
+      clientProbe.step++;
+      var now = new Date().getTime();
 
-    setTimeout(function() {clientProbe.benchmarkTick(clientProbe)}, clientProbe.timeStep);
+      var last;
+      if (clientProbe.benchmarkData.sessionData.length > 0) {
+        last = clientProbe.benchmarkData.sessionData[clientProbe.benchmarkData.sessionData.length - 1].time;
+      } else {
+        last = now - clientProbe.timeStep;
+      }
+
+      clientProbe.benchmarkData.sessionData.push({
+        plannedTime: last + clientProbe.timeStep,
+        time: now
+      });
+
+      setTimeout(function () {
+        clientProbe.benchmarkTick(clientProbe)
+      }, clientProbe.timeStep);
+    } else {
+      clientProbe.uploadResult();
+    }
+  },
+
+  uploadResult: function () {
+    var self = this;
+    var data = JSON.stringify({
+      clientInfo: self.clientInfo,
+      benchmarkData: self.benchmarkData
+    });
+    localStorage.setItem('savedClientProbeData', data);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'http://localhost:8888/api/v1/analytic-entry', true);
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    xhr.onreadystatechange = function() {
+      if(xhr.readyState == 4 && xhr.status == 200) {
+        localStorage.removeItem('savedClientProbeData');
+        console.log('Successfully uploaded, removing stored data.')
+      }
+    };
+
+    xhr.send(data);
   },
 
   exportData: function () {
     var self = this;
-    self.saveBenchmarkData();
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent('{"clientInfo": ' + localStorage.getItem('clientInfo') + ', "benchmarkData":' + localStorage.getItem('benchmarkData') + '}');
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent('{"clientInfo": ' + JSON.stringify(self.clientInfo) + ', "benchmarkData":' + JSON.stringify(self.benchmarkData) + '}');
     var dlAnchorElem = document.getElementById('downloadAnchorElem');
     dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute("download", "measurements.json");
@@ -136,5 +126,5 @@ ClientProbe.prototype = {
  * Self calling function for initializing the client and attaching to the window object
  */
 (function () {
-  window.participatoryClientProbe = new ClientProbe('http://localhost:8080')
+  window.participatoryClientProbe = new ClientProbe()
 }());

@@ -9,3 +9,4 @@ TaskMaster/Frontend/typings
 TaskMaster/Frontend/app/**/*.js
 TaskMaster/Frontend/app/**/*.map
 .idea
+*.dist.js

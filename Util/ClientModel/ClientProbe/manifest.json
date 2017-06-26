@@ -1,0 +1,10 @@
+{
+  "name": "Participatory Client Probe",
+  "version": "1.0",
+  "manifest_version": 2,
+  "content_scripts": [{
+    "js": ["ChromeInjector.js"],
+    "matches": ["http://*/*", "https://*/*"]
+  }],
+  "web_accessible_resources": ["ClientProbe.dist.js"]
+}

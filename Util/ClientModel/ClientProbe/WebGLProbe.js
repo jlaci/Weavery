@@ -21,17 +21,25 @@ WebGLProbe.prototype = {
   getResult: function () {
     document.body.innerHTML += '<canvas style="display: none" id="probe-canvas" width="0" height="0"></canvas>';
     var canvas = document.getElementById('probe-canvas');
-    var gl = canvas.getContext('experimental-webgl');
 
-    var result = {
-      vendor: getUnmaskedInfo(gl).vendor,
-      renderer: getUnmaskedInfo(gl).renderer
-    };
+    if(canvas) {
+      var gl = canvas.getContext('experimental-webgl');
 
-    var element = document.getElementById('probe-canvas');
-    element.outerHTML = "";
+      var result = {
+        vendor: getUnmaskedInfo(gl).vendor,
+        renderer: getUnmaskedInfo(gl).renderer
+      };
 
-    return result;
+      var element = document.getElementById('probe-canvas');
+      element.outerHTML = "";
+
+      return result;
+    } else {
+      return {
+        vendor: 'Unknown',
+        renderer: 'Unknown'
+      }
+    }
   }
 };
 

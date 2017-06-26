@@ -1,0 +1,13 @@
+{
+  "name": "ConfigurationManager",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express":"4.14.0",
+    "body-parser":"1.15.2",
+    "mongoose":"4.6.1",
+    "greenlock-express":"2.0.11"
+  }
+}

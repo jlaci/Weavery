@@ -1,0 +1,10 @@
+{
+  "name": "ClientProbe",
+  "version": "0.0.1",
+  "scripts": {
+    "package": "uglifyjs client.min.js WebGLProbe.js ClientProbe.js -o ClientProbe.dist.js"
+  },
+  "devDdependencies": {
+    "uglify-js": "3.0.20"
+  }
+}
