@@ -4,8 +4,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var config = require('./config');
 var mongoose = require('mongoose');
-var letsEncrypt = config.letsEncrpyt || false;
-var httpsEnabled = config.https || false;
+var httpsSetting = config.https || 'no';
 
 
 mongoose.connect(config.mongoUri);
@@ -36,7 +35,7 @@ app.use(bodyParser.json());
 app.use('/api/v1', api);
 app.use('/', router);
 
-if(letsEncrypt) {
+if(httpsSetting === 'lets-encrypt') {
   var lex = require('greenlock-express').create({
     // set to https://acme-v01.api.letsencrypt.org/directory in production
     server: 'staging',
@@ -68,19 +67,22 @@ if(letsEncrypt) {
   });
 
   console.log('Analytics collector started!');
-} else if(httpsEnabled) {
+} else if(httpsSetting === 'valid-cert' || httpsSetting === 'self-signed') {
   var fs = require('fs');
   var https = require('https');
 
   var options = {
-    key: fs.readFileSync('keys/server.key'),
-    cert: fs.readFileSync('keys/server.crt'),
-    ca: fs.readFileSync('keys/server.ca')
+    key: fs.readFileSync('certs/server.key'),
+    cert: fs.readFileSync('certs/server.crt')
   };
+
+  if(httpsSetting === 'valid-cert') {
+    options.ca = fs.readFileSync('certs/server.ca');
+  }
 
   var httpsServer = https.createServer(options, app);
   httpsServer.listen(8443);
-} else {
+} else if (httpsSetting === 'no'){
   app.listen(config.port);
   console.log('Analytics collector started on ' + config.port + ' port!');
 }

@@ -3,7 +3,7 @@ var app = module.exports = express();
 var AnalyticEntry = require('./model/AnalyticEntry');
 
 app.get('/', function (req, res) {
-  AnalyticEntry.findOne({}, function (err, analyticEntry) {
+  AnalyticEntry.find({}, function (err, analyticEntry) {
         if(!err) {
             res.json(analyticEntry);
         } else {

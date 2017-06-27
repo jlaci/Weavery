@@ -99,7 +99,7 @@ ClientProbe.prototype = {
     localStorage.setItem('savedClientProbeData', data);
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://localhost:8888/api/v1/analytic-entry', true);
+    xhr.open('POST', 'https://localhost:8443/api/v1/analytic-entry', true);
     xhr.setRequestHeader("Content-type", "application/json");
 
     xhr.onreadystatechange = function() {
