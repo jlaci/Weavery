@@ -20,16 +20,41 @@ db.once('open', function () {
 });
 
 function doStationary() {
+
   AnalyticEntry.find({}, function (err, data) {
+    var probabilities = [];
 
     _.forEach(data, function (entry) {
-      if(entry.benchmarkData.sessionData.length > 0) {
+      if (entry.benchmarkData.sessionData.length > 0) {
         var aggregate = aggregateEntry(entry);
-        console.log('Session time: ' + aggregate.totalTime + 'ms, potential steps: ' +  Math.ceil(aggregate.totalTime / timeStep) + ' actual steps: ' + (aggregate.correct + aggregate.incorrect) + '(' + (aggregate.correct + aggregate.incorrect) / Math.ceil(aggregate.totalTime / timeStep) * 100 + ')% correct: ' + aggregate.correct + ' incorrect: ' + aggregate.incorrect);
-        console.log(JSON.stringify(calculateProbabilities(aggregate), null, 2));
+
+        if(aggregate.totalTime > 1000) {
+          var probability = calculateProbabilities(aggregate);
+          probabilities.push(probability);
+          console.log('Session time: ' + aggregate.totalTime + 'ms, potential steps: ' + Math.ceil(aggregate.totalTime / timeStep) + ' actual steps: ' + (aggregate.correct + aggregate.incorrect) + '(' + (aggregate.correct + aggregate.incorrect) / Math.ceil(aggregate.totalTime / timeStep) * 100 + ')% correct: ' + aggregate.correct + ' incorrect: ' + aggregate.incorrect);
+          console.log(JSON.stringify(probability, null, 2));
+        }
       }
     });
 
+    var errors = {
+      idle: [],
+      partAndCommitment: [],
+      partAndStarvation: []
+    };
+
+    for (var i = 0; i < probabilities.length - 1; i++) {
+      var prob = probabilities[i];
+      var next = probabilities[i + 1];
+
+      errors.idle.push(Math.pow(next.idle - prob.idle, 2));
+      errors.partAndCommitment.push(Math.pow(next.partAndCommitment - prob.partAndCommitment, 2));
+      errors.partAndStarvation.push(Math.pow(next.partAndStarvation - prob.partAndStarvation, 2));
+    }
+
+    console.log(errors.idle);
+    console.log(errors.partAndCommitment);
+    console.log(errors.partAndStarvation);
   });
 }
 
