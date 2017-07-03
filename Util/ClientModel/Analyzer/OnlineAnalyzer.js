@@ -6,18 +6,76 @@ var config = require('./config');
 
 var threshold = 10;
 var timeStep = 500;
-var mode = 'stationary';
+var windowNumber = 5;
+var mode = 'sliding';
 
 mongoose.connect(config.mongoUri);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
-  if(mode === 'total') {
+  if (mode === 'total') {
     doTotal();
-  } else if(mode === 'stationary') {
+  } else if (mode === 'stationary') {
     doStationary();
+  } else if (mode === 'sliding') {
+    doSlidingWindow();
   }
 });
+
+function doSlidingWindow() {
+  function calculateWindow(start, end, cb) {
+    var totalAggregate = {
+      correct: 0,
+      incorrect: 0,
+      totalTime: 0
+    };
+
+    AnalyticEntry.find({"benchmarkData.sessionData.plannedTime" : { $gte: start}}, function (err, data) {
+      _.forEach(data, function (entry) {
+        if (entry.benchmarkData.sessionData.length > 0) {
+
+          entry.benchmarkData.sessionData = _.filter(entry.benchmarkData.sessionData, function (sessionDataEntry) {
+            return sessionDataEntry.plannedTime.getTime() < end.getTime();
+          });
+
+          var aggregate = aggregateEntry(entry);
+          totalAggregate.correct += aggregate.correct;
+          totalAggregate.incorrect += aggregate.incorrect;
+          totalAggregate.totalTime += aggregate.totalTime;
+        }
+      });
+
+      cb(calculateProbabilities(totalAggregate));
+    });
+  }
+
+
+  var start, end;
+  AnalyticEntry.find({}).sort({"benchmarkData.sessionData.plannedTime" : 1}).limit(1).exec(function (err, first) {
+    start = first[0].benchmarkData.sessionData[0].plannedTime;
+
+    AnalyticEntry.find({}).sort({"benchmarkData.sessionData.plannedTime" : -1}).limit(1).exec(function (err, last) {
+      end = last[0].benchmarkData.sessionData[last[0].benchmarkData.sessionData.length - 1].plannedTime;
+
+      var windowLength = (end.getTime() - start.getTime()) / (windowNumber - 1);
+      var probabilities = [];
+
+      for(var i = 0; i < windowNumber; i++) {
+        calculateWindow(new Date(start.getTime() + (windowLength * i)), new Date(start.getTime() + (windowLength * (i + 1))), function (result) {
+          probabilities.push(result);
+
+          if(probabilities.length === windowNumber) {
+            console.log("Finished");
+          }
+        });
+      }
+    });
+  });
+
+
+
+}
+
 
 function doStationary() {
 
@@ -79,7 +137,7 @@ function doTotal() {
 
 function calculateProbabilities(aggregate) {
 
-  var potentialSteps = Math.ceil(aggregate.totalTime / timeStep);
+  var potentialSteps = Math.ceil(aggregate.totalTime / timeStep) + 1;
 
   return {
     idle: 1 - (aggregate.correct + aggregate.incorrect) / potentialSteps,
